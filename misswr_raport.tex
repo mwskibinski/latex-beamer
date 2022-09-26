@@ -1,0 +1,2045 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage{polski}
+\usepackage{geometry}
+	\geometry{margin = 2.5cm}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{bold-extra}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{graphicx}
+\usepackage[unicode, colorlinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage[shortlabels]{enumitem}
+	\setlist[itemize]{--, itemsep = 0cm}
+\usepackage{amsmath}
+\usepackage{subfig}
+
+\linespread{1.3}
+
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+
+\lstdefinestyle{mystyle}{%
+	backgroundcolor = \color{backcolour},
+%	basicstyle = \ttfamily \small,
+ 	basicstyle = \ttfamily \footnotesize,
+	commentstyle = \color{green!50!black},
+	numberstyle = \tiny \color{codegray},
+	stringstyle = \color{codepurple},
+	keywordstyle = \color{blue!85!black},
+	breakatwhitespace = false,
+	breaklines = true,
+	captionpos = b,
+	keepspaces = true,
+	showspaces = false,
+	showstringspaces = false,
+	showtabs = false,
+	tabsize = 4,
+	numbers = left,
+	numberstyle = \tiny \color{black},
+	morecomment = [l]{\%},
+	frame = single
+}
+
+\lstset{
+	style = mystyle,
+%	language = MATLAB,
+	morekeywords = {byte},
+	literate = %
+		{ą}{{\k{a}}}1
+		{Ą}{{\k{A}}}1
+		{ć}{{\'c}}1
+		{Ć}{{\'{C}}}1
+		{ę}{{\k{e}}}1
+		{Ę}{{\k{E}}}1
+		{ł}{{\l{}}}1
+		{Ł}{{\L{}}}1
+		{ń}{{\'n}}1
+		{Ń}{{\'N}}1
+		{ó}{{\'o}}1
+		{Ó}{{\'O}}1
+		{ś}{{\'s}}1
+		{Ś}{{\'S}}1
+		{ż}{{\.z}}1
+		{Ż}{{\.Z}}1
+		{ź}{{\'z}}1
+		{Ź}{{\'Z}}1
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{MiSSwR -- Raport końcowy}
+\rhead{Sekcja nr 1}
+\cfoot{\thepage}
+
+\graphicspath{
+	{./img/}
+	{./img/chapter_4/} {./img/chapter_7/} {./img/chapter_8/} {./img/chapter_9/}
+}
+
+\newcommand{\vectorQ}{$\mathbf{q}$}
+\newcommand{\matrixT}{$\mathbf{T}$}
+\newcommand{\matrixA}{$\mathbf{A}$}
+
+\DeclareMathOperator
+	{\kmPERh}
+	{\textstyle \frac{\text{km}}{\text{h}}}
+\DeclareMathOperator
+	{\mPERs}
+	{\textstyle \frac{\text{m}}{\text{s}}}
+\DeclareMathOperator
+	{\degPERs}
+	{\textstyle \frac{^{\circ}}{\text{s}}}
+\DeclareMathOperator
+	{\radPERs}
+	{\textstyle \frac{\text{rad}}{\text{s}}}
+\DeclareMathOperator
+	{\rad}
+	{\textstyle \text{rad}}
+\DeclareMathOperator
+	{\pitch}
+	{\text{pitch}}
+\DeclareMathOperator
+	{\roll}
+	{\text{roll}}
+\DeclareMathOperator
+	{\yaw}
+	{\text{yaw}}
+
+\setlength{\jot}{0.2cm}
+
+
+
+%%%
+%%%		DOKUMENT
+%%%
+
+\begin{document}
+
+
+
+%%%
+%%%		TITLEPAGE
+%%%
+
+\begin{titlepage}
+{\LARGE
+\begin{center}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width = 0.2\linewidth]{C:/good_folder/nauka/inne/polsl_logo_v2}
+	\end{figure}
+	
+	\vspace{0.25cm}
+	
+	\textbf{\textsc{Politechnika Śląska}}
+	
+	\textbf{\textsc{Wydział Automatyki, Elektroniki i Informatyki}}
+	
+	\vspace{1.5cm}
+	
+	Modele i Systemy Sterowania w Robotyce
+	
+	\vspace{1.5cm}
+	
+	Raport końcowy
+\end{center}
+}
+
+\vfill
+
+{\Large
+\noindent
+\textbf{AiR S2-I/Rob}\\
+\textbf{Sekcja nr 1}:
+
+\noindent
+\hspace*{0.5cm} Piotr Gruchalski\\
+\hspace*{0.5cm} Paweł Kaźmieruk\\
+\hspace*{0.5cm} Tomasz Kuś\\
+\hspace*{0.5cm} Maksymilian Skibiński\\
+\hspace*{0.5cm} Paweł Szczech\\
+\hspace*{0.5cm} Mateusz Szczepanik\\
+
+% rok 2020/2021, sem. letni, gr. Rob, sekcja nr 1
+
+\vspace{0.5cm}
+}
+
+\begin{center}
+\today{} r.
+\end{center}
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\tableofcontents
+
+\newpage
+
+
+
+%%%
+%%%		CONTENT
+%%%
+
+
+
+%
+%		WSTEP
+%
+
+\section*{Wstęp}
+\addcontentsline{toc}{section}{Wstęp}
+
+W ramach laboratorium przerobiono materiał zawarty w książce Petera Corke'a ,,\emph{Robotics, Vision and Control}''. Potrzebne informacje zawarte były w czterech rozdziałach:
+\begin{itemize}
+    \item rozdział 4: Roboty mobilne
+    \item rozdział 7: Kinematyka manipulatora
+    \item rozdział 8: Prędkość manipulatora
+    \item rozdział 9: Dynamika i kontrola
+\end{itemize}
+
+Środowiskiem pracy w trakcie wirtualnych zajęć był MATLAB, a głównym narzędziem wykorzystywanym do wykonywania ćwiczeń był Robotics Toolbox, również autorstwa Corke'a.
+
+\newpage
+
+
+
+%
+%		1
+%
+
+\section{Zadanie proste i odwrotne kinematyki (27.05.2021)}
+
+W ramach tych ćwiczeń laboratoryjnych należało zapoznać się z treścią rozdziałów 7.1 i 7.2 książki i wykorzystać omawiane skrypty dla przydzielonych sekcjom manipulatorów. Schemat kinematyczny manipulatora przydzielony sekcji nr 1 jest przedstawiony na rysunku \ref{fig:manipulator}.
+\begin{figure}[htbp!]
+	\centering
+	\fbox{\includegraphics[width = 0.9\linewidth]{schemat}}
+	\caption{Schemat kinematyczny manipulatora \label{fig:manipulator}}
+\end{figure}
+
+Struktura przedstawionego manipulatora to OOO%
+\footnote{W książce, i innych materiałach w języku angielskim, taki manipulator jest oznaczony jako RRR, gdzie R to skrót od \emph{revolute}}
+ -- składa się z 3 par kinematycznych obrotowych. Korzystając z zapisu Denavita-Hartenberga można zadeklarować manipulator w MATLABie.
+
+\begin{lstlisting}
+% Stałe parametry (przykładowe wartości).
+lambda_1 = 4;
+lambda_2 = 2;
+lambda_3 = 2;
+
+l_1 = 4;
+l_3 = 3;
+
+% Deklaracja członów.
+L1 = Revolute('d', lambda_1, 'a', l_1, 'alpha', -pi/2);
+L2 = Revolute('d', -lambda_2, 'a', 0, 'alpha', pi/2);
+L3 = Revolute('d', lambda_3, 'a', l_3, 'alpha', 0);
+
+% Deklaracja manipulatora.
+rob = SerialLink([L1 L2 L3], 'name', 'r0b0t');
+\end{lstlisting}
+
+Za pomocą metody \texttt{plot}%
+\footnote{Mowa o metodzie \texttt{plot} obiektu klasy \texttt{SerialLink}, a nie o funkcji \texttt{plot} występującej w podstawowym MATLABie}
+można przedstawić manipulator dla wybranych współrzędnych naturalnych członów (umieszczonych w wektorze $\mathbf{q}$).
+\begin{lstlisting}
+% Wektor współrzędnych naturalnych.
+q = [0, 1.8, 0];
+
+% Manipulator dla tych współrzędnych.
+rob.plot(q);
+view(157, 22);
+\end{lstlisting}
+
+Ten kod tworzy rysunek \ref{fig:plot}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{plot}
+	\caption{Użycie funkcji \texttt{plot} \label{fig:plot}}
+\end{figure}
+
+Dla użytego wektora $\mathbf{q}$ oraz funkcji \texttt{view} (która zmienia położenie obserwatora względem robota) obraz manipulatora jest zbliżony do obrazu, jaki widać na schemacie kinematycznym (rys. \ref{fig:manipulator}).
+
+Bardziej zaawansowanym sposobem na obserwowanie, jak zmiana współrzędnych naturalnych manipulatora wpłynie na położenie i orientację elementu wykonawczego, jest używanie metody \texttt{teach} (rys. \ref{fig:teach}). Tym razem nie podaje się konkretnego wektora $\mathbf{q}$, tylko korzysta z suwaków do określenia dokładnych wartości składowych tego wektora. Ponadto, w górnej części menu jest zapisane położenie i orientacja Roll-Pitch-Yaw układu skojarzonego z elementem wykonawczym.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{teach}
+	\caption{Użycie metody \texttt{teach} \label{fig:teach}}
+\end{figure}
+
+Zadanie proste kinematyki jest problemem geometrycznym polegającym na obliczeniu położenia i orientacji manipulatora na podstawie współrzędnych naturalnych członów. Opis manipulatora przechodzi zatem z przestrzeni wewnętrznej (wektor $\mathbf{q}$) do przestrzeni zewnętrznej. Dotychczas wspomniane metody \texttt{plot} oraz \texttt{teach} rozwiązywały omawiany problem, ale zadanie może być rozwiązane również z użyciem metody \texttt{fkine} --  tym razem na podstawie wektora $\mathbf{q}$ stworzona zostanie macierz \matrixT{} opisującą układ współrzędnych związany z elementem wykonawczym. Przykładowo:
+\begin{lstlisting}[numbers = none]
+>> rob.fkine([0, 0, 0])
+ 
+
+ans = 
+         1         0         0         7
+         0         1         0        -2
+         0         0         1         6
+         0         0         0         1
+>> rob.fkine([0, pi/2, 0])
+ 
+
+ans = 
+         0         0         1         6
+         0         1         0        -2
+        -1         0         0         1
+         0         0         0         1
+\end{lstlisting}
+
+Co więcej, metoda \texttt{fkine} może zwrócić nie tylko macierz \matrixT, ale także macierze pośrednie \matrixA, które opisują relację pomiędzy poszczególnymi układami współrzędnych związanymi z członami manipulatora.
+\begin{lstlisting}
+[T, ALL] = rob.fkine([pi/2, pi/3, 0])
+\end{lstlisting}
+
+W omawianym przypadku, wyjściowa macierz \texttt{ALL} zawiera 3 macierze pośrednie \matrixA.
+
+Korzystając z własności \texttt{base} oraz \texttt{tool}, można zdefiniować macierze przekształceń wpływające na położenie i orientację układów: 
+\begin{itemize}
+    \item związanego z podstawą robota,
+    \item związanego z elementem wykonawczym.
+\end{itemize}
+W kodzie poniżej zadeklarowano przesunięcie o 4 wzdłuż osi z oraz obrót o $\frac{\pi}{4}$ wokół osi z.
+Rezultat widoczny jest na rysunku \ref{fig:base}.
+\begin{lstlisting}
+rob.base = SE3(0, 0, 4) * SE3.Rz(-pi/4);
+\end{lstlisting}
+
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[bez zmiany]{%
+		\includegraphics[width = 0.45\linewidth]{base1}%
+	}%
+	\hfill%
+	\subfloat[użycie wspomnianego kodu]{%
+		\includegraphics[width = 0.45\linewidth]{base2}%
+	}%
+	
+	\caption{Wpływ zmiany własności \texttt{base} \label{fig:base}}
+\end{figure}
+
+Podobny efekt można uzyskać zmieniając parametry Denavita-Hartenberga.
+
+\subsubsection*{Zadanie odwrotne kinematyki}
+
+W zadaniu odwrotnym kinematyki \emph{wejściem} jest pożądane położenie i orientacje elementu wykonawczego, a \emph{wyjściem} współrzędne naturalne członów manipulatora. Ten problem jest znacznie trudniejszy: może istnieć więcej niż jedno rozwiązanie wartości zadanych, ale może także nie być żadnego rozwiązania -- o tym decyduje przestrzeń robocza manipulatora.
+
+Rozwiązań tego problemu można szukać na dwa sposoby:
+\begin{itemize}
+\item analitycznie -- korzystając ze zmiennych symbolicznych wyprowadza się równania kinematyki prostej, a następnie przekształca je tak, by otrzymać wzory jawne wyrażające zadaną składową położenia/orientacji w funkcji współrzędnych naturalnych,
+\item numerycznie -- bazując na iteracyjnym rozwiązywaniu zadania prostego kinematyki, aż błąd pomiędzy zadanym położeniem a otrzymanym będzie jak najmniejszy -- jest to pewnego rodzaju problem optymalizacji.
+\end{itemize}
+
+Metody analityczne są szybsze, ale wraz ze wzrostem liczby par kinematycznych (i tym samym zmiennych w równaniach) równania znacznie się komplikują i otrzymanie rozwiązania w postaci jawnej może być niemożliwe. Używając funkcji \texttt{ikine6s} można otrzymać rozwiązania analityczne dla robotów o 6 stopniach swobody z kiścią sferyczną.
+
+Metody numeryczne działają wolniej, ale są znacznie bardziej uniwersalne. Można z nich korzystać poprzez funkcję \texttt{ikine}.\\
+
+Badany manipulator ma 3 stopnie swobody, przez co jego przestrzeń robocza jest ograniczona -- nie będzie można osiągnąć każdej pozycji efektora. Zatem przy używaniu funkcji \texttt{ikine} należy zdefiniować \emph{maskę}, poprzez którą deklaruje się, które składowe położenia/orientacji mają zostać zignorowane, a które nie -- w omawianym przypadku co najmniej 3 składowe muszą zostać zignorowane. Przykładowe użycie:
+\begin{lstlisting}
+% Pożadane położenie i orientacja el. wykonawczego.
+T = SE3(7, -2, 6.2) * SE3.rpy(pi/4, 0, pi/6);
+
+% Rozwiązanie zadania odwrotnego kinematyki, dla użytej maski.
+q_ikine = rob.ikine(T, 'mask', [1, 1, 1, 0, 0, 0]);
+
+% Rozwiązanie zadania prostego dla otrzymanych współrzędnych naturalnych.
+T_ikine = rob.fkine(q_ikine);
+T_ikine.print('xyz')
+\end{lstlisting}
+
+W efekcie otrzymano:
+\begin{lstlisting}[numbers = none]
+t = (7, -2, 6.2), RPY/xyz = (-7.03, -3.99, 0.374) deg
+\end{lstlisting}
+
+Powyższy kod zaczyna się od deklaracji macierzy \matrixT{} określającej pożądane położenie i orientację efektora. Następnie rozwiązywane jest zad. odwr. kin. dla tej macierzy, przy czym maska wskazuje, że orientacja ma zostać zignorowana. By sprawdzić otrzymane rozwiązanie program oblicza macierz \matrixT{} dla uzyskanych współrzędnych naturalnych. Jak widać, położenie pokrywa się z zadanym, a orientacje się różnią, na co należało przystać.
+
+Tego kodu można także używać dla innych macierzy \matrixT{} oraz innych masek, należy jednak pamiętać że:
+\begin{itemize}
+\item nie znajdzie on rozwiązania dla każdej macierzy \matrixT{}, gdyż manipulator jest ograniczony poprzez swoją strukturę,
+\item można zmieniać wektor wartości binarnych określający maskę, ale mogą tam się znaleźć co najwyżej 3 jedynki. Przy mniejszej liczbie jedynek niż 3 rozwiązanie może bardziej odbiegać od wartości zadanych.
+\end{itemize}
+
+\newpage
+
+
+
+%
+%		2
+%
+
+\section{Planowanie trajektorii (31.05.2021)}
+
+Jednym z najczęstszych zadań stawianych manipulatorom jest płynny ruch pomiędzy dwoma zadanymi punktami. To zadanie można rozwiązać na dwa sposoby:
+\begin{itemize}
+\item ruch prostoliniowy w przestrzeni konfiguracyjnej,
+\item ruch prostoliniowy w przestrzeni kartezjańskiej.
+\end{itemize}
+
+Pierwszy sposób polega na użyciu funkcji \texttt{jtraj} -- funkcja ta dla dwóch zadanych wektorów współrzędnych naturalnych i wektora czasu zwróci wektory współrzędnych naturalnych tworzących trajektorię pomiędzy dwoma zadanymi wartościami granicznymi. Ponadto można także otrzymać odpowiadające danym chwilom czasu prędkości i przyspieszenia członów. Przykładowo, dla pewnych dwóch macierzy $\mathbf{T}_1$, $\mathbf{T}_2$ określających zadane pozycje efektora:
+\begin{lstlisting}
+% Rozwiązanie zadania odwrotnego kinematyki dla
+% pozycji początkowej i końcowej.
+q1 = rob.ikine(T1, 'mask', [1, 1, 1, 0, 0, 0]);
+q2 = rob.ikine(T2, 'mask', [1, 1, 1, 0, 0, 0]);
+
+% Przykładowy wektor czasu.
+t = [0 : 0.05 : 2]';
+
+% Generowanie trajektorii w przestrzeni wewnętrznej.
+[q, qd, qdd] = jtraj(q1, q2, t);
+\end{lstlisting}
+
+Teraz, dla otrzymanej \emph{macierzy} \texttt{q}, która zawiera współrzędne naturalne dla zadanych chwil czasu, można skorzystać z metody \texttt{plot}, by uruchomić animację, która przedstawi ruch manipulatora. Można także rozwiązać zadanie proste kinematyki dla tych współrzędnych, by otrzymać macierze \matrixT{} określające położenie el. wykonawczego na każdym etapie animacji.
+
+Do wykonywania ruchu prostoliniowego efektora w przestrzeni kartezjańskiej służy z kolei funkcja \texttt{ctraj}.
+\begin{lstlisting}
+Ts = ctraj(T1, T2, length(t));
+\end{lstlisting}
+
+Porównanie otrzymanych trajektorii znajduje się na rysunku \ref{fig:traj}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.45\linewidth]{traj1}%
+	}%
+	\hfill%
+	\subfloat[zbliżenie na \texttt{ctraj}]{%
+		\includegraphics[width = 0.45\linewidth]{traj2}%
+	}%
+	
+	\caption{Porównanie funkcji \texttt{jtraj} i \texttt{ctraj} -- trajektorie \label{fig:traj}}
+\end{figure}
+
+Trajektorie różnią się znacząco, chociaż oczywiście punkty początkowe i końcowe są takie same. Dla generacji trajektorii prostoliniowej w przestrzeni kartezjańskiej, punkty pośrednie tworzą linie prostą, a dla generacji traj. w przestrzeni konfiguracyjnej nie. Porównanie wyznaczonych współrzędnych naturalnych znajduje się na rysunku \ref{fig:trajQ}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.45\linewidth]{traj_jtraj_q}%
+	}%
+	\hfill%
+	\subfloat[zbliżenie na \texttt{ctraj}]{%
+		\includegraphics[width = 0.45\linewidth]{traj_ctraj_q}%
+	}%
+	
+	\caption{Porównanie funkcji \texttt{jtraj} i \texttt{ctraj} -- współrzędne naturalne \label{fig:trajQ}}
+\end{figure}
+
+Wykresy pokazują, że nie tylko zmieniły się wyznaczone wartości \emph{pośrednie} \vectorQ{}, ale także wartości \emph{końcowe}. Wartości końcowe \vectorQ{} dla obu wariantów skutkują jednak w tym samym zadanym położeniu punktu końcowego, choć w innej orientacji, na co należało przystać.
+
+Można zadać pytanie: co to znaczy, że trajektoria jest liniowa w przestrzeni konfiguracyjnej? Należy sporządzić wykresy analogiczne jak z rysunków \ref{fig:traj}, ale inaczej opisać osie, tak by przedstawiały wartości współrzędnych naturalnych. Porównanie dla obu trajektorii widać na rysunku \ref{fig:qspace}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.45\linewidth]{traj_qspace}%
+	}%
+	\hfill%
+	\subfloat[zbliżenie na \texttt{ctraj}]{%
+		\includegraphics[width = 0.45\linewidth]{traj_qspace2}%
+	}%
+	
+	\caption{Porównanie funkcji \texttt{jtraj} i \texttt{ctraj} -- przestrzeń konfiguracyjna \label{fig:qspace}}
+\end{figure}
+
+Tym razem to trajektoria wyznaczona poprzez \texttt{jtraj} jest liniowa, a wyznaczona poprzez \texttt{ctraj} już nie (choć odbiega od liniowej tylko nieznacznie). Na rysunkach widać także zauważony na wcześniejszych wykresach fakt: wartości końcowe współrzędnych naturalnych różnią się.
+
+Przy wykorzystywaniu omówionych sposobów do generacji trajektorii należy pamiętać, że ruch prostoliniowy nie zawsze będzie możliwy. Nawet jeżeli punkty początkowe i końcowe należą do przestrzeni roboczej manipulatora, punkty pośrednie trajektorii niekoniecznie muszą do niej należeć, szczególnie w omawianym przypadku, gdy do dyspozycji mamy manipulator o jedynie 3 stopniach swobody. Wszystko zależy od kształtu przestrzeni roboczej robota. Ponadto mogą wystąpić sytuacje gdy ruch prostoliniowy jest możliwy w jednej przestrzeni, a w drugiej nie.
+
+\newpage
+
+
+
+%
+%		3
+%
+
+\section{Jakobian (07.06.2021)}
+
+Jakobian jest macierzą, która określa zależność pomiędzy tempem zmian współrzędnych naturalnych manipulatora \vectorQ{} a położeniem i orientacją członu wykonawczego w przestrzeni kartezjańskiej i vice versa.
+\begin{align*}
+\boldsymbol{\nu} & = \mathbf{J}\mathbf{\dot{q}} \\
+\mathbf{\dot{q}} & = \mathbf{J}^{-1}\boldsymbol{\nu} \\
+\end{align*}
+
+gdzie:
+\begin{itemize}
+\item $\boldsymbol{\nu}$ -- oznacza prędkości w przestrzeni kartezjańskiej:
+\begin{equation*}
+\boldsymbol{\nu} = \left[
+\nu_x \ \nu_y \ \nu_z \ \omega_x \ \omega_y \ \omega_z
+\right]
+\end{equation*}
+
+\item $\mathbf{\dot{q}}$ -- oznacza prędkości w przestrzeni konfiguracyjnej:
+\begin{equation*}
+\phantom{\qquad N \text{-- liczba stopni swobody}}
+\dot{\mathbf{q}} = \left[
+\dot{q}_1 \ \dot{q}_2 \ \ldots \ \dot{q}_N
+\right]
+\qquad N \ \text{-- liczba stopni swobody}
+\end{equation*}
+
+\item $\mathbf{J}$ -- jakobian, czyli macierz, która zawiera wszystkie kombinacje pochodnych cząstkowych składowych
+$\boldsymbol{\nu}$ i $\mathbf{\dot{q}}$.
+\begin{equation*}
+\mathbf{J} =
+\frac{\partial \boldsymbol{\nu}}{\partial \dot{\mathbf{q}}} =
+	\begin{bmatrix}
+	\frac{\partial \nu_1}{\partial \dot{q}_1} & \cdots & \frac{\partial \nu_1}{\partial \dot{q}_N} \\
+	\vdots & \ddots & \vdots\\
+	\frac{\partial \nu_6}{\partial \dot{q}_1} & \cdots & \frac{\partial \nu_6}{\partial \dot{q}_N}
+	\end{bmatrix}
+\end{equation*}
+
+Jest ona macierzą o wymiarach 6 x N. Istotne jest, że wartości jej elementów zależą od współrzędnych naturalnych \vectorQ{}, czyli tak naprawdę: $\mathbf{J}(\mathbf{q})$.
+\end{itemize}
+
+Do wyznaczania jakobianów wykorzystuje się funkcje:
+\begin{itemize}
+\item \texttt{jacob0} -- jakobian wyznaczony względem układu bazowego:
+${}^{0}\mathbf{J}(\mathbf{q})$,
+\item \texttt{jacobe} -- jakobian wyznaczony względem układu członu wykonawczego:
+${}^{E}\mathbf{J}(\mathbf{q})$.
+\end{itemize}
+
+Przykładowo:
+\begin{lstlisting}
+% Przykładowe współrzędne naturalne.
+q = [0, 0, 0];
+
+% Wyznaczenie jakobianu.
+J = rob.jacob0(q);
+\end{lstlisting}
+
+da w rezultacie:
+\begin{lstlisting}[numbers = none]
+J =
+
+    2.0000    2.0000         0
+    7.0000    0.0000    3.0000
+         0   -3.0000         0
+         0         0         0
+         0    1.0000         0
+    1.0000    0.0000    1.0000
+\end{lstlisting}
+
+O czym mówią takie wartości?
+
+Zaczynając od wymiarów -- macierz jest prostokątna o wymiarach 6 x 3, co wynika z faktu, że pozycja obiektu w przestrzeni kartezjańskiej ma 6 składowych (3 dla położenia i 3 dla orientacji), a omawiany manipulator ma 3 stopnie swobody. Przy analizie jakobianu, warto zaznaczyć, że rzędom odpowiada przestrzeń kartezjańska, a kolumnom przestrzeń konfiguracyjna.
+
+W pierwszej kolumnie widzimy zera i wartości niezerowe. Zero oznacza, że zmiany wartości \emph{tej konkretnej} współrzędnej naturalnej nie wpływają na zmiany tej konkretnej współrzędnej kartezjańskiej. W przykładowym jakobianie zmiany współrzędnej naturalnej $q_1$ w ogóle nie wpływają na współrzędną z położenia i na obroty wokół osi x i y elementu wykonawczego.
+
+Niezerowe liczby w komórkach macierzy świadczą o tym że zmiana $\nu_i$ wpłynie na tę konkretną współrzędną $q_j$. Im liczba większa tym silniejszy efekt wywrze zmiana danej współrzędnej.
+
+Jak już zostało wspomniane, ta konkretna macierz $\mathbf{J}$ została wyznaczona dla konkretnych współrzędnych naturalnych \vectorQ{} i ulegnie ona zmianie gdy zmianie ulegną wsp. naturalne. Dla przykładu wprowadzono drobną zmianę: niech $q_1$ będzie teraz równe $5^{\circ}$.
+\begin{lstlisting}
+% Przykładowe współrzędne naturalne -- poprzednie.
+q = [0, 0, 0];
+
+% Przykładowe współrzędne naturalne -- zmiana.
+q = [5 * pi/180, 0, 0];
+\end{lstlisting}
+
+W rezultacie otrzymano:
+\begin{lstlisting}[numbers = none]
+J =
+
+    1.3823    1.9924   -0.2615
+    7.1477    0.1743    2.9886
+         0   -3.0000         0
+         0   -0.0872         0
+         0    0.9962         0
+    1.0000    0.0000    1.0000
+\end{lstlisting}
+
+Niewielki ruch spowodował, że pewne elementy macierzy $\mathbf{J}$ się zmieniły, a inne nie. Przydatne w takiej analizie jest posługiwanie się metodą \texttt{teach}.
+
+Jakobian można także wyznaczyć względem układu związanego z elementem wykonawczym przy pomocy metody \texttt{jacobe}. Macierze wyznaczone przez \texttt{jacob0} i \texttt{jacobe} mogą się pokrywać dla pewnych wektorów $\mathbf{q}$. Ponadto zmiany konkretnej składowej wektora $\mathbf{q}$ mogą mieć wpływ na zmiany jednej z macierzy, a na drugą nie.
+
+Jakobiany wyznaczane przez wymienione funkcje domyślnie wyrażają wpływ na orientację efektora poprzez prędkości kątowe: $\omega_x$, $\omega_y$, $\omega_z$. Korzystając z dodatkowych opcjonalnych argumentów funkcji, można sprecyzować, by stosowany był zapis względem kątów Roll-Pitch-Yaw lub kątów Eulera.\\
+
+Zgodnie z równaniem przedstawionym na początku rozdziału, jakobiany można wykorzystać do wyznaczenia odpowiednich prędkości $\dot{\mathbf{q}}$ lub $\boldsymbol{\nu}$. Należy jednak zdawać sobie sprawę, że omawiany manipulator ma tylko 3 stopnie swobody.
+
+Przykład:
+\begin{lstlisting}
+% Współrzędne naturalne w danej pozie.
+qn = [1.5, 1, 0.5];
+
+% Jakobian dla współrzędnych qn.
+J = rob.jacob0(qn);
+
+% Wektor pożądanych prędkości.
+vel = [0, 0.25, 0, 0, 0, 0];
+
+% Wyznaczenie odpowiednich prędkości q.
+qd = pinv(J) * vel';
+
+% Rezultat.
+xd = J * qd; xd = xd';
+
+vel
+xd
+\end{lstlisting}
+
+Manipulator znajduje się w pewnej pozie opisanej poprzez wektor współrzędnych naturalnych $\mathbf{q}_n$ -- wyznaczono jakobian dla tej pozy. Następnie podano pewien wektor pożądanych prędkości w przestrzeni zewnętrznej. Biorąc pod uwagę równanie przedstawione na początku rozdziału, można skorzystać ze wzoru, by wyznaczyć odpowiednie prędkości w przestrzeni konfiguracyjnej. Problem jednak polega na tym, że omawiany manipulator ma tylko 3 stopnie swobody -- nie można zatem po prostu odwrócić macierzy $\mathbf{J}$. Pewnym rozwiązaniem jest skorzystanie z \emph{pseudoodwracania}%
+\footnote{Prawdopodobnie najlepsze tłumaczenie terminu \emph{pseudo-inverse}}
+poprzez funkcję \texttt{pinv}.
+% Takie podejście spowoduje, że wyznaczone rozwiązanie charakteryzuje minimalny błąd (metoda najmniejszych kwadratów) pomiędzy prędkościami zadanymi, a faktycznie uzyskanymi, czyli zminimalizowana zostanie norma: $||\mathbf{J} \dot{\mathbf{q}} - \boldsymbol{\nu}||$
+Takie podejście spowoduje, że zminimalizowana zostanie norma: $||\mathbf{J} \dot{\mathbf{q}} - \boldsymbol{\nu}|$, czyli różnica jest pomiędzy prędkościami zadanymi a faktycznie otrzymanymi.
+
+Porównanie prędkości zadanych i otrzymanych:
+\begin{lstlisting}[numbers = none]
+vel =
+
+         0    0.2500         0         0         0         0
+
+
+xd =
+
+   -0.0134    0.1765    0.0111    0.0426   -0.1029   -0.0165
+\end{lstlisting}
+
+Różnice są znaczne -- zadano jedynie prędkość wzdłuż osi x przy pozostałych zerowych, a otrzymane rozwiązanie posiada wszystkie prędkości niezerowe. Funkcja \texttt{pinv} starała się zminimalizować błędy, ale te i tak pojawiły się w rozwiązaniu.
+
+Inny sposób: omawiany manipulator ma 3 stopnie swobody, zatem wykorzystano je w inny sposób zadając tylko 3 prędkości.
+\begin{lstlisting}
+% ,,Kwadratyzacja'' jakobianu, poprzez usunięcie 3 ostatnich wierszy.
+J_xyz = J(1:3, :);
+
+% Wyznaczenie odpowiednich prędkości q,
+% ale tylko dla prędkości względem osi x, y, z.
+qd = inv(J_xyz) * vel(1:3)';
+
+% Rezultat.
+xd = J * qd; xd = xd'
+\end{lstlisting}
+
+Usunięto 3 ostatnie wiersze jakobianu, tak by stał się kwadratowy. W ten sposób zignorowane zostaną wpływy zmian współrzędnych naturalnych na orientację. Wektor pożądanych prędkości także ograniczono do pierwszych 3 składowych -- w ten sposób jakobian i zadane prędkości są zgodne ze sobą. Teraz można po prostu odwrócić uproszczony jakobian.
+
+Rezultat:
+\begin{lstlisting}[numbers = none]
+xd =
+
+         0    0.2500         0    0.0572   -0.1506   -0.0270
+\end{lstlisting}
+
+Tym razem udało się osiągnąć zadane prędkości: $\nu_x$, $\nu_y$, $\nu_z$. Wciąż  prędkości obrotowe są niezerowe, ale jawnie zezwolono na to, upraszczając jakobian i wektor prędkości zadanych. Pewnych ograniczeń manipulatora o niewystarczającej liczbie stopni swobody nie sposób obejść.\\
+
+Kolejną ważną kwestią istotną z punktu widzenia jakobianów są osobliwości. Osobliwości kinematyczne to takie konfiguracje manipulatora dla których det($\mathbf{J}$) = 0. Możemy je podzielić na dwie grupy:
+\begin{itemize}
+\item osobliwości graniczne przestrzeni roboczej -- pojawiają się przy w pełni złożonych/rozłożonych członach,
+\item osobliwości wnętrza przestrzeni roboczej -- pojawiają się gdy w jednej linii ustawione są co najmniej dwie osie par obrotowych lub przesuwnych.
+\end{itemize}
+
+Manipulator, który znajduje się w konfiguracji osobliwej utracił jeden lub więcej stopni swobody, co znacznie utrudnia ruch elementu wykonawczego.
+
+Przykładowo, dla badanego manipulatora OOO konfiguracja osobliwa wystąpi gdy
+współrzędne naturalne to: $\mathbf{q} = \left[0 \quad 0 \quad \frac{\pi}{2} \right]$.
+Manipulator w tej konfiguracji widoczny jest na rysunku \ref{fig:sing} poniżej.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.45 \linewidth]{sing1}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.45 \linewidth]{sing2}%
+	}%
+	
+	\caption{Manipulator w konifguracji osobliwej \label{fig:sing}}
+\end{figure}
+
+Kod:
+\begin{lstlisting}
+% Współrzędne naturalne.
+q = [0, 0, pi/2];
+
+% Jakobian.
+J = rob.jacob0(q);
+
+% Część jakobianu odpowiadająca prędkościom liniowym
+J_xyz = J(1:3, :);
+
+% Czy wystąpiła osobliwość?
+jsingu(J_xyz)
+det(J_xyz)
+rank(J_xyz)
+\end{lstlisting}
+
+Górna ,,kwadratowa'' część jakobianu (\texttt{J\_xyz}) to:
+\begin{lstlisting}[numbers = none]
+J_xyz =
+
+   -1.0000    2.0000   -3.0000
+    4.0000         0    0.0000
+         0   -0.0000         0
+\end{lstlisting}
+
+Należy zwrócić uwagę na dwie rzeczy:
+\begin{itemize}
+\item ostatni rząd macierzy, odpowiadający prędkości wzdłuż osi z, stanowią zera,
+\item druga i trzecia kolumna macierzy, odpowiadające współrzędnym naturalnym $q_2$ i $q_3$, są do siebie proporcjonalne.
+\end{itemize}
+
+Wyznacznik tej macierzy jest zerowy%
+\footnote{Precyzyjniej: jest pomijalnie mały, a jego niezerowość wynika z niedokładności obliczeń.}%
+, a jej rząd zmniejszył się o jeden do 2.
+\begin{lstlisting}[numbers = none]
+ans =
+
+   2.2044e-15
+
+
+ans =
+
+     2
+\end{lstlisting}
+
+Użycie funkcji \texttt{jsingu} zwraca informację, że:
+\begin{lstlisting}[numbers = none]
+1 linearly dependent joints:
+  q3 depends on: q2 
+\end{lstlisting}
+
+Co zaobserwowano już wcześniej, analizując jakobian (fragment wyżej).
+
+Dokonano drobnej zmiany wektora $\mathbf{q}$, wychodząc z konfiguracji osobliwej
+\begin{lstlisting}
+% Współrzędne naturalne -- poprzednie.
+q = [0, 0, pi/2];
+
+% Współrzędne naturalne -- aktualne.
+q = [0, 0, pi/2 + 1 * pi/180];
+\end{lstlisting}
+
+Zmianie uległa ostatnia współrzędna -- dodany został kąt $1^{\circ}$. Teraz jakobian nie jest macierzą osobliwą
+\begin{lstlisting}[numbers = none]
+ans =
+
+   -0.6227
+\end{lstlisting}
+
+choć wyznacznik jest wciąż bardzo małą liczbą. Zbadano wpływ tej konfiguracji na wyznaczanie prędkości.
+\begin{lstlisting}
+% Pożądane prędkości liniowe.
+vel = [0.0, 0.0, 0.1];
+
+% Odpowiadające im prędkości q.
+qd = inv(J_xyz) * vel'
+\end{lstlisting}
+
+Zadany został wektor prędkości liniowych \texttt{vel} i korzystając z jakobianu obliczono odpowiednie prędkości w przestrzeni wewnętrznej $\dot{\mathbf{q}}$. W rezultacie otrzymano:
+\begin{lstlisting}[numbers = none]
+qd =
+
+    0.0168
+    1.9100
+    1.2679
+\end{lstlisting}
+
+Dla porównania dokonano tych samych obliczeń dla innej, znacznie dalszej od punktu osobliwego konfiguracji manipulatora. Wtedy:
+\begin{lstlisting}[numbers = none]
+qd =
+
+    0.0217
+    0.0975
+    0.0628
+\end{lstlisting}
+
+Gdy zadano prędkość liniową wzdłuż osi z, dla konfiguracji bliskiej osobliwej, prędkości wewnętrzne $q_2$, $q_3$ rosną znacząco -- im bliżej osobliwości tym bliższe są one nieskończoności.
+
+Osobliwość nie oznacza jednak, że manipulator \emph{zupełnie} nie potrafi wykonywać zadanych ruchów. Dla przykładu zadano inny wektor prędkości: $\boldsymbol{\nu} = \left[0 \quad 0.1 \quad 0 \right]$, czyli zamiast osi z wybrano oś y, i w rezultacie otrzymano:
+\begin{lstlisting}[numbers = none]
+qd =
+
+    0.0252
+   -0.0000
+   -0.0084
+\end{lstlisting}
+
+Tym razem otrzymane prędkości są znacznie mniejsze, co dowodzi, że analizowana konfiguracja nie jest problematyczna dla tego ruchu.
+
+Przy analizie osobliwości manipulatora przydatne mogą być elipsoidy prędkości. Dla kodu:
+\begin{lstlisting}
+rob.teach('callback', @(r, q) r.vellipse(q));
+\end{lstlisting}
+
+pojawi się manipulator, którym można sterować, a przy członie wykonawczym będzie odpowiednia elipsoida. Wygodniej jednak, dla celów raportu, będzie wykorzystać metodę \texttt{vellipse}, która pokaże samą elipsoidę dla zadanej konfiguracji.
+
+Przykładowy kod:
+\begin{lstlisting}[numbers = none]
+% Konfiguracja.
+qns = [0, 0, pi/2 + 1 * pi/180];
+
+% Elipsoida prędkości -- dla ruchu liniowego.
+rob.vellipse(qns, 'trans');
+
+% Współczynnik manipulacyjności.
+m = rob.maniplty(qns, 'trans')
+\end{lstlisting}
+
+Porównano dwie konfiguracje: jedną bliską osobliwej i drugą dalszą od niej. Elipsoidy dla nich można zobaczyć na rysunku \ref{fig:elip}.
+
+
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{elip1}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{elip2}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{elip3}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{elip4}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{elip5}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{elip6}%
+	}%
+	
+	\caption{Elipsoidy prędkości \label{fig:elip}}
+	a, b, c -- blisko osobliwości \phantom{aaaaa} d, e, f -- znacznie dalej
+\end{figure}
+
+Dla konfiguracji bliskiej osobliwej (rysunki a, b, c), elipsoida jest bardzo płaska -- blisko jej do elipsy z pominięciem wymiaru z. W przypadku drugiej konfiguracji, elipsoidę cechuje już znacznie większa objętość i bliżej jej do kuli w porównaniu do konf. prawie osobliwej.
+
+Do podobnych wniosków można dojść badając odpowiedni współczynnik, który jest propocjonalny do objętości elipsoidy.
+\begin{lstlisting}[numbers = none]
+m =
+
+    0.6227
+
+m =
+
+    7.1637
+\end{lstlisting}
+
+Pierwsza wartość dotyczy konfiguracji bliskiej osobliwej. Większa wartość oznacza lepszą konfigurację. Taki współczynnik nie daje natomiast informacji o tym, wzdłuż której osi ruch jest trudniejszy.
+
+Podobną analizę można prowadzić dla ruchu obrotowego.
+
+\newpage
+
+
+
+%
+%		4
+%
+
+\section{Jakobian -- Simulink (10.06.2021)}
+
+W ramach tych ćwiczeń należało przygotować jeden z przykładowych programów w Simulinku, który domyślnie jest napisany dla robota Puma 560, dla badanego manipulatora. Schemat po odpowiednich zmianach widoczny jest na rysunku \ref{fig:jacobianSimulink}.
+\begin{figure}[htbp!]
+	\centering
+	\fbox{\includegraphics[width = \linewidth]{jacobian_simulink}}
+	\caption{Schemat w Simulinku \label{fig:jacobianSimulink}}
+\end{figure}
+
+Dokonane zmiany to:
+\begin{itemize}
+\item blok wyznaczający jakobian ${}^{0}\mathbf{J}$ na podstawie aktualnej konfiguracji $\mathbf{q}$ jest teraz wyznaczany dla omawainego robota (o nazwie ,,r0b0t''),
+\item podobnie z blokiem rozwiązującym zadanie proste kinematyki,
+\item a także z blokiem \emph{circle centre}, który wyznacza środek okręgu względem wybranej początkowej konfiguracji manipulatora,
+\item blok \emph{Interpreted MATLAB Fcn} następujący po bloku ${}^{0}\mathbf{J}$, który domyślnie odwraca jakobian, dodatkowo usuwa z niego 3 ostatnie rzędy dotyczące prędkości obrotowych, by był macierzą kwadratową,
+% \item dodany został kolejny blok \emph{Interpreted MATLAB Fcn}, który z wektora prędkości $\boldsymbol{\nu}^{*}$, usuwa trzy ostatnie elementy dotyczące prędkości obrotowych
+\item dodany został kolejny blok \emph{Interpreted MATLAB Fcn}, który z wektora $\boldsymbol{\nu}^{*}$ usuwa trzy ostatnie elementy dotyczące prędkości obrotowych.
+\end{itemize}
+
+Poza tym, w ramach testów, pewnym zmianom ulegały: parametry okręgu (blok \emph{Circle}) oraz wzmocnienie \emph{Kp}.\\
+
+Zadanie, które stoi przed manipulatorem to ruch (elementem wykonawczym) wzdłuż trajektorii w kształcie okręgu. Przedstawiony schemat stanowi zamknięty układ regulacji z regulatorem typu P. By wykonać takie zadanie, system sterowania manipulatorem:
+\begin{itemize}
+\item wyznacza jakobian dla aktualnej konfiguracji,
+\item wyznacza pożądane prędkości w przestrzeni kartezjańskiej potrzebne do realizacji celu,
+\item na podstawie dwóch powyższych oblicza prędkości w przestrzeni wewnętrznej ($\dot{\mathbf{q}}$).
+\end{itemize}
+
+Zamknięcie układu regulacji w pętli sprzężenia zwrotnego pozwala na likwidację problemów związanych z kumulacją błędów. Regulując wzmocnienie części P, można wpływać na intensywność, z jaką sygnały sterujące będą starały się likwidować wspomniane błędy.
+
+Porównanie otrzymanych trajektorii dla kilku ze sprawdzonych wzmocnień widać na rysunku \ref{fig:jacobianP} poniżej.
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[$K_p = 1$]{%
+		\includegraphics[width = 0.32 \linewidth]{jac_sim_p1}%
+	}%
+	\hfill%
+	\subfloat[$K_p = 3$]{%
+		\includegraphics[width = 0.32 \linewidth]{jac_sim_p3}%
+	}%
+	\hfill%
+	\subfloat[$K_p = 5$]{%
+		\includegraphics[width = 0.32 \linewidth]{jac_sim_p5}%
+	}%
+	
+	\subfloat[$K_p = 10$]{%
+		\includegraphics[width = 0.32 \linewidth]{jac_sim_p10}%
+	}%
+	\hfill%
+	\subfloat[$K_p = 20$]{%
+		\includegraphics[width = 0.32 \linewidth]{jac_sim_p20}%
+	}%
+	\hfill%
+	\phantom{\subfloat[$K_p = 1$]{%
+		\includegraphics[width = 0.32 \linewidth]{jac_sim_p1}%
+	}}%
+	
+	\caption{Porównanie otrzymanych trajektorii dla zmian wzmocnienia $K_p$ \label{fig:jacobianP}}
+\end{figure}
+
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[prędkości $\boldsymbol{\nu}$ -- dla ruchu liniowego]{%
+		\includegraphics[width = 0.48 \linewidth]{jac_sim_v}%
+	}%
+	\hfill%
+	\subfloat[prędkości $\dot{\mathbf{q}}$]{%
+		\includegraphics[width = 0.48 \linewidth]{jac_sim_q}%
+	}%
+	
+	\caption{Wykresy prędkości dla $K_p = 5$ \label{fig:jacobianQV}}
+\end{figure}
+
+Dla małych wzmocnień ($K_p = 1$, $K_p = 3$) narysowany przez efektor okrąg nie jest zgodny z zadanymi parametrami (zbyt mały promień). Poczynając od $K_p = 5$ okrąg ma już właściwy promień. Dla wzmocnienia znacznie większego, czyli $K_p = 20$, efektor pod sam koniec zaczyna schodzić z poprawnej trasy -- drobne błędy zbyt mocno wpływają na sygnały sterujące.
+
+Schemat pozwala w łatwy sposób odczytać wyznaczone prędkości $\dot{\mathbf{q}}$ i $\boldsymbol{\nu}$. Przykładowo, dla wzmocnienia $K_p = 5$ zostały umieszczone na rysunku \ref{fig:jacobianQV}.
+
+
+Zgodnie z oczekiwaniami, zadanie ruchu po obwodzie okręgu na płaszczyźnie XY, nie wygenerowało prędkości wzdłuż osi z. Co do członów manipulatora, jak widać do ruchu nie została wykorzystana druga para kinematyczna.
+
+\newpage
+
+
+
+%
+%		5
+%
+
+\section{Dynamika (14.06.2021, 17.06.2021)}
+
+Dynamika robota jest opisywana poprzez następujące równanie macierzowe:
+\begin{equation*}
+\mathbf{Q} =
+	\mathbf{M} (\mathbf{q}) \ddot{\mathbf{q}} +
+	\mathbf{C} (\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} +
+	\mathbf{F} (\dot{\mathbf{q}}) +
+	\mathbf{G}(\mathbf{q})
+\end{equation*}
+
+gdzie:
+\begin{itemize}
+\item $\mathbf{q}$, $\dot{\mathbf{q}}$, $\ddot{\mathbf{q}}$ -- wektory współrzędnych, prędkości i przyspieszeń uogólnionych,
+\item $\mathbf{M}$ -- macierz inercji/bezwładności, która jest symetryczna,
+\item $\mathbf{C}$ -- macierz sił Coriolisa i odśrodkowych (którą można rozdzielić na dwie osobne macierze dla wspomnianych sił),
+\item $\mathbf{F}$ -- wektor sił tarcia,
+\item $\mathbf{G}$ -- wektor sił grawitacji,
+\item $\mathbf{Q}$ -- wektor sił i momentów działających na manipulator.
+\end{itemize}
+
+Proste zadania dynamiki to takie, w których należy znaleźć wektor $\mathbf{Q}$ dla podanej konfiguracji manipulatora, czyli wektorów $\mathbf{q}$, $\dot{\mathbf{q}}$, $\ddot{\mathbf{q}}$. Odwrotne zadanie zajmuje się tym samym, ale w odwrotnej kolejności.
+
+Do wyznaczania wektora $\mathbf{Q}$ można wykorzystać metodę \texttt{rne}, np. w następujący sposób:
+\begin{lstlisting}
+% Konfiguracja
+q = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1];
+qd = [0.05, 0, 0, 0.05, 0, 0];
+qdd = [0, 0, 0, 0, 0, 0];
+
+% Wektor Q
+Q = p560.rne(q, qd, qdd)
+\end{lstlisting}
+
+Ta metoda wyznacza odpowiednie siły i momenty napędowe wykorzystując iteracyjny algorytm Newtona-Eulera, który składa się z dwóch faz:
+\begin{description}
+\item[faza I: od podstawy do el. wykonawczego] wyznaczane są prędkości oraz przyspieszenia każdego członu,
+\item[faza II: od el. wykonawczego do podstawy] wyznaczane są siły i momenty.
+\end{description}
+
+Do wyznaczenia elementów macierzy występujących w równaniu dynamiki można skorzystać z kilku poleceń:
+\begin{itemize}
+\item \texttt{gravload} -- wektor sił grawitacji,
+\item \texttt{inertia} -- macierz bezwładności,
+\item \texttt{coriolis} -- macierz sił Coriolisa,
+\item \texttt{friction} -- wektor sił tarcia.
+\end{itemize}
+
+Tym poleceniom podawane są na wejście wektory odpowiednich współrzędnych, zgodnie z równaniem dynamiki.
+
+Macierze te zależą nie tylko od konfiguracji robota, ale także innych parametrów, których wartość można sprawdzić korzystając z pola \texttt{dyn} odpowiednich członów, na przykład:
+\begin{lstlisting}[numbers = none]
+>> p560.links(3).dyn
+Revolute(std): theta=q, d=0.15005, a=0.0203, alpha=-1.5708, offset=0
+  m    = 4.8        
+  r    = -0.0203     -0.0141     0.07       
+  I    = | 0.066       0           0           |
+         | 0           0.086       0           |
+         | 0           0           0.0125      |
+  Jm   = 0.0002     
+  Bm   = 0.00138    
+  Tc   = 0.132      (+) -0.105     (-)
+  G    = -53.71     
+  qlim = -3.926991 to 0.785398
+\end{lstlisting}
+
+gdzie:
+\begin{itemize}
+\item najpierw wypisane są parametry kinematyczne,
+\item \texttt{m} oznacza masę członu,
+\item \texttt{r} -- pozycję środka masy (COM),
+\item \texttt{I} -- bezwładność członu,
+\item \texttt{Jm} -- bezwładność silnika,
+\item \texttt{Bm} -- tarcie silnika,
+\item \texttt{Tc} -- tarcie Coulomba (dla obu kierunków ruchu),
+\item \texttt{G} -- przełożenie przekładni,
+\item \texttt{qlim} -- dostępne zakresy współrzędnych uogólnionych.
+\end{itemize}
+
+Niestety, wprowadzenie tych parametrów dla badanego manipulatora okazało się przerastać możliwości członków sekcji, dlatego zadania z tej sekcji wykonano dla robota Puma.
+
+\subsection*{zad. 1}
+
+\subsubsection*{a)}
+
+Dalsze zwiększanie wzmocnienia P regulatora powoduje zwiększanie przeregulowania oraz pojawienie się oscylacji, nie powoduje natomiast zmniejszenia błędu w stanie ustalonym. Z kolei zmniejszanie tego wzmocnienia tylko pogarsza jakość regulacji -- odpowiedź układu jest znacznie wolniejsza.
+
+Dodanie części I znacznie poprawia pracę układu. Łącząc części P i I, uzyskano poprawnie działający układ regulacji, który odpowiada na zmiany wejścia z satysfakcjonującą prędkością, a uchyb dąży do zera.
+
+\subsubsection*{b)}
+
+By wykonać zadanie, zgodnie ze schematem blokowym zapisano zmienne odpowiadające za: regulator P/PI, transmitancję silnika, wzmocnienie Km. Korzystając z polecenia \texttt{feedback} zamknięto układ w pętli sprzężenia zwrotnego, a korzystając z \texttt{rlocus} zbadano linie pierwiastkowe.
+
+Zmiany parametrów regulatora wykazały, że nastawy regulatora nie mają wpływu na stabilność układu, który zawsze jest stabilny (więc maksymalne dozwolone wzmocnienie jest nieskończone), a jedynie na jakość regulacji.
+
+\subsubsection*{c)}
+
+Zaproponowano sposób modyfikacji \texttt{vloop}, który widać na rysunku \ref{fig:dyn_1c}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = \linewidth]{dyn_1c}
+	\caption{Sterowanie napięciem oraz efekt EMF \label{fig:dyn_1c}}
+\end{figure}
+
+Dodane zostały dwa bloki w środku pomiędzy \emph{velocity controller}, a \emph{motor}. Dzielenie przez rezystancję związane jest z konwersją napięcia na wyjściu regulatora na prąd, którym sterowany jest motor, a ujemne napięcie EMF zależy od prędkości silnika i jest proporcjonalne do stałej~$K_m$.
+
+\subsubsection*{d)}
+
+Zjawisko windupu całkowania występuje, gdy wypracowywany przez regulator sygnał jest wyższy niż wartości graniczna urządzenia wykonawczego. Uchyb regulacji jest cały czas całkowany. Powoduje to zauważalne opóźnienia sygnału wyjściowego, np. w sytuacji, gdy nagle skokowo zmienimy wartość zadaną.
+
+Najłatwiejszym rozwiązaniem tego problemu jest zatrzymanie pracy części całkującej, gdy sygnał sterujący osiąga zbyt duże (lub zbyt małe) wartości.
+
+% \subsubsection*{e)}
+
+\subsection*{zad. 2}
+
+Należy wykazać, że:
+\begin{equation*}
+\text{N} \ \text{m} \ \text{A}^{-1} = \text{V} \ \text{s} \ \text{rad}^{-1}
+\end{equation*}
+
+Wiedząc, że:
+\begin{equation*}
+\text{N} = \text{kg} \ \text{m} \ \text{s}^{-2} \qquad\qquad
+\text{V} = \text{kg} \ \text{m}^2 \ \text{A}^{-1} \ \text{s}^{-3}
+\end{equation*}
+
+Biorąc pod uwagę wspomniane zależności, po przekształceniach otrzymano:
+\begin{equation*}
+\text{kg} \ \text{m}^2 \ \text{s}^{-2} \ \text{A}^{-1} = 
+\text{kg} \ \text{m}^2 \ \text{s}^{-2} \ \text{A}^{-1} \ \text{rad}^{-1}
+\end{equation*}
+
+Wiedząc, że radian jest jednostką bezwymiarową, można usunąć ją z wyrażenia, dzięki czemu obie strony równania będą sobie równe.
+
+\subsection*{zad. 3}
+
+\subsubsection*{a)}
+
+Zakłócenie pochodzące ze strony siły grawitacji w funkcji współrzędnych uogólnionych widać na rysunkach~\ref{fig:dyn_3a}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.4 \linewidth]{dyn_3a_1}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.4 \linewidth]{dyn_3a_2}%
+	}%
+	
+	\caption{Zadanie 3a \label{fig:dyn_3a}}
+\end{figure}
+
+Siła ta jest największa, gdy człony są wyprostowane.
+
+\subsubsection*{b)}
+
+Bezwładność członu 1 w funkcji położenia członu 2 widać na rysunku~\ref{fig:dyn_3b}.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5 \linewidth]{dyn_3b}
+	\caption{Bezwładność członu 1 w funkcji położenia członu 2 \label{fig:dyn_3b}}
+\end{figure}
+
+\subsection*{zad. 4}
+
+Na wykresach~\ref{fig:dyn_4} zostały przedstawione siły grawitacji działające na człony w konfiguracji współrzędnych $q_2$ i $q_3$. Na rysunkach dolnych widać zmiany wprowadzone poprzez dodanie obciążenia do efektora manipulatora.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.75 \linewidth]{dyn_4}
+	\caption{Siły grawitacji w funkcji konfiguracji, oraz wpływ obciążenia \label{fig:dyn_4}}
+\end{figure}
+
+Dodanie obciążenia (2.5 kg) spowodowało wzrost sił grawitacji.
+
+\subsection*{zad. 5}
+
+Podobnie jak w zadaniu poprzednim, na wykresach~\ref{fig:dyn_5} widać wpływ konfiguracji manipulatora na bezwładność członów. Na dolnych wykresach widać wpływ obciążenia.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.75 \linewidth]{dyn_5}
+	\caption{Siły bezwładności w funkcji konfiguracji, oraz wpływ obciążenia \label{fig:dyn_5}}
+\end{figure}
+
+Zgodnie z oczekiwaniami, dodanie obciążenia spowodowało odpowiedni wzrost sił bezwładności.
+
+\subsection*{zad. 6}
+
+Wpływ obciążenia na siłę bezwładności działającą na człon 2 w funkcji położenia członu 3 widać na rysunku~\ref{fig:dyn_6}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5 \linewidth]{dyn_6}
+	\caption{Wpływ obciążenia na siłę bezwładności działającą na człon 2 w funkcji położenia członu 3 \label{fig:dyn_6}}
+\end{figure}
+
+Tak jak w poprzednim zadaniu widać, że dodanie obciążenia prowadzi do zwiększenia tej siły.
+
+\subsection*{zad. 7}
+
+Dodanie obciążenia powoduje wzrost wartości średniej bezwładności w całym dostępnym zakresie współrzędnej uogólnionej, ale także znacznie zwiększa zakres odczuwanej bezwładności.
+
+\subsection*{zad. 8}
+
+Można to powiązać z trzecią zasadą dynamiki Newtona. Na głównej diagonali znajdują się siły bezwładności odczuwane przez konkretny j-ty człon, a poza nią znajdują się siły, które wynikają z wpływu bezwładności jednego członu na inny człon.
+
+% \subsection*{zad. 9}
+
+\subsection*{zad. 10}
+Na rysunkach~\ref{fig:dyn_10} pokazana została elipsoida przyspieszenia przestrzennego dla danej konfiguracji manipulatora.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{dyn_10_1}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{dyn_10_2}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{dyn_10_3}%
+	}%
+
+	\caption{Elipsoida przyspieszenia przestrzennego \label{fig:dyn_10}}
+\end{figure}
+
+Główna oś elipsoidy określa kierunek w którym efektor ma największe przyspieszenia dla danej konfiguracji. Im elipsoida bliższa jest kuli, tym łatwiej jest manipulatorowi przyspieszać w dowolnym kierunku. Miarę tej wartości można wyznaczyć dzieląc najmniejszy promień przez największy.
+
+\subsection*{zad. 11}
+
+\subsubsection*{a)}
+
+Przykładowe błędy dla ustawień domyślnych widać na rysunku~\ref{fig:dyn_11a}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{dyn_11a_1}
+	\caption{Błędy \label{fig:dyn_11a}}
+\end{figure}
+
+Przy czym warunki początkowe, końcowe i czas zadania to:
+\begin{align*}
+\text{początek:} \quad & q_0 = \left[0 \ 0 \ 0 \ 0 \ 0 \ 0 \right] \\
+\text{koniec:} \quad & q_g = \left[
+	\frac{\pi}{4} \ \frac{\pi}{2} \ -\frac{\pi}{2} \ 0 \ 0 \ 0 \right] \\
+\text{czas:} \quad & 5 \ \text{s}
+\end{align*}
+
+Błędy w trakcie realizacji zadania są stosunkowo niewielkie, rzędu $10^{-3}$.
+
+Przeprowadzono kilka eksperymentów związanych ze zmianami parametrów:
+\begin{itemize}
+\item Ustawienie zbyt małego oczekiwanego czasu realizacji trajektorii powodowało zwiększenie błędów.
+\item Zwiększanie wzm. części P pozwoliło zmniejszyć błędy regulacji, ale zwiększało oscylacje. Natomiast zmniejszanie P, powodowało znaczne błędy w fazie końcowej symulacji.
+\item Zwiększanie oraz zmniejszanie wzm. D nie przyniosło większych zmian. Przy całkowicie wyłączonym D, drobnemu pogorszeniu uległ błąd w stanie końcowym.
+\end{itemize}
+
+Badania w pewnym stopniu komplikował fakt, że symulacja jest bardzo zasobożerna i trwa stosunkowo długo.
+
+\subsubsection*{b)}
+
+% 0.07 utrata stabilności, czym wyższa tym szybciej ją traci
+
+Na wykresach\ref{fig:dyn_11b} widać wpływ zwiększania czas obliczeń $T_{fb}$ na podążanie manipulatora za trajektorią. Czas domyślny to: $T_{fb} = 0.002 \ \text{s}$ (rysunek\ref{fig:dyn_11a}).
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[$T_{fb} = 0.005 \ \text{s}$]{%
+		\includegraphics[width = 0.22 \linewidth]{dyn_11b_1}%
+	}%
+	\hfill%
+	\subfloat[$T_{fb} = 0.01 \ \text{s}$]{%
+		\includegraphics[width = 0.22 \linewidth]{dyn_11b_2}%
+	}%
+	\hfill%
+	\subfloat[$T_{fb} = 0.02 \ \text{s}$]{%
+		\includegraphics[width = 0.22 \linewidth]{dyn_11b_3}%
+	}%
+	\hfill%
+	\subfloat[$T_{fb} = 0.05 \ \text{s}$]{%
+		\includegraphics[width = 0.22 \linewidth]{dyn_11b_4}%
+	}%
+
+	\caption{Zmniejszanie tempa obliczania momentu \label{fig:dyn_11b}}
+\end{figure}
+
+Wraz ze zwiększaniem tego czasu, pogarsza się praca manipulatora. System sterowania musi generować większe siły, przez to że wyznacza odpowiednie momenty i siły rzadziej. Dla jeszcze wyższych czasów $T_{fb}$, system sterowania zaczyna tracić stabilność.
+
+\subsubsection*{c)}
+
+W tym podpunkcie użyta została metoda \texttt{perturb} do symulacji nie w pełni znanego modelu manipulatora. Zmian można dokonać w następujący sposób: \emph{RNE} $\rightarrow$ \emph{MATLAB Fcn}
+$\rightarrow$ jako pierwszy argument funkcji \texttt{rne} podaje się nie sam manipulator (\texttt{robot}), ale jego zakłócony model (\texttt{robot.perturb(0.1)}). Wpływ takich zmian widać na rysunku~\ref{fig:dyn_11c}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5 \linewidth]{dyn_11c}
+	\caption{Wpływ zakłóconego modelu na błędy \label{fig:dyn_11c}}
+\end{figure}
+
+Porównując ten wykres z~\ref{fig:dyn_11a} można zauważyć, że błędy nieco urosły (maksymalny błąd wzrósł o kilkadziesiąt procent). Znacząco zmienił się natomiast kształt wykresu błędów - po perturbacjach wykres jest bardziej chaotyczny, zawiera element losowości, co jest zgodne z oczekiwaniami.
+
+\newpage
+
+
+
+%
+%		6
+%
+
+\section{Roboty mobilne (21.06.2021, 24.06.2021)}
+
+\subsection*{zad. 1}
+
+\subsubsection*{a)}
+
+Na początku wyprowadzono odpowiednie wzory:
+\begin{gather*}
+v = 20 \ \kmPERh \approx 5.56 \ \mPERs
+	\qquad
+	\dot{\theta} = 10 \ \degPERs \approx 0.175 \ \radPERs \\
+\gamma = \tan^{-1} \left(
+	\frac{\dot{\theta} L}{v}
+	\right)
+\end{gather*}
+
+Zatem, zakładając model roweru dla pojazdu, pożądany kąt skrętu $\gamma$ to 0.0629 rad. Stosując sterowanie Ackermanna:
+\begin{gather*}
+\gamma_{\text{L}} = \tan^{-1} \left(
+	\frac{L}{R_{\text{B}} - 0.5 \cdot w}
+	\right)
+	\qquad
+\gamma_{\text{R}} = \tan^{-1} \left(
+	\frac{L}{R_{\text{B}} + 0.5 \cdot w}
+	\right)
+\end{gather*}
+
+Wtedy kąty skrętu dla kół przednich to: $\gamma_{\text{L}}$ = 0.0644 rad, $\gamma_{\text{R}}$ = 0.0614 rad.
+
+\subsubsection*{b)}
+
+Tym razem zmieniono promień skrętu dla modelu roweru $R_{\text{B}}$. Wzory na kąty skrętów są identyczne jak powyżej. Odpowiedź:
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{c||c|c|c}
+		$R_{\text{B}} \ \text{[m]}$ &
+			10 & 50 & 100 \\
+			\hline\hline
+		$\gamma_{\text{L}} \ \text{[rad]}$ &
+			0.2129 & 0.0406 & 0.0201 \\
+			\hline
+		$\gamma \ \text{[rad]}$ &
+			0.1974 & 0.0400 & 0.0200 \\
+			\hline
+		$\gamma_{\text{R}} \ \text{[rad]}$ &
+			0.1839 & 0.0394 & 0.0198
+	\end{tabular}
+\end{table}
+
+\subsubsection*{c)}
+
+Obie strony pojazdu muszą poruszać się z tą samą prędkością kątową względu okręgu (ze środkiem w punkcie ICR), zatem:
+\begin{equation*}
+\dot{\theta} =
+	\frac{v}{R_{\text{B}}} =
+	\frac{v_L}{R_{\text{L}}} =
+	\frac{v_R}{R_{\text{R}}}
+\end{equation*}
+
+gdzie $v$ oznaczają odpowiednie prędkości liniowe, a $R$ promienie okręgu zataczanych przez odpowiednie części pojazdu. Dalej wyprowadzono wzory na prędkości obrotowe:
+\begin{equation*}
+\omega_{\text{L}} = \frac{\dot{\theta} R_{\text{L}}}{r}
+	\qquad
+\omega_{\text{R}} = \frac{\dot{\theta} R_{\text{R}}}{r}
+\end{equation*}
+
+Przez $r$ oznaczono promień opony kół. Założono, że są takie same. Wtedy:
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{c||c|c|c}
+		$R_{\text{B}} \ \text{[m]}$ &
+			10 & 50 & 100 \\
+			\hline\hline
+		$\omega_{\text{L}} \ [\radPERs]$ &
+			82.2222 & 87.5556 & 88.2222 \\
+			\hline
+		$\omega_{\text{R}} \ [\radPERs]$ &
+			95.5556 & 90.2222 & 89.5556
+	\end{tabular}
+\end{table}
+
+\subsection*{zad. 2}
+
+W poprzednim zadaniu wspomniano, że:
+\begin{equation*}
+\dot{\theta} =
+	\frac{v}{R_{\text{B}}} =
+	\frac{v_L}{R_{\text{L}}} =
+	\frac{v_R}{R_{\text{R}}}
+\end{equation*}
+
+Dodatkowo wiadomo, że prędkość obrotowa koła zależy od prędkości liniowej w następujący sposób:
+\begin{equation*}
+\omega = \frac{v}{r}
+\end{equation*}
+
+gdzie $r$ oznacza promień koła. Łącząc powyższe:
+\begin{equation*}
+\dot{\theta}_L = \frac{\omega_L \ r_L}{R_L}
+\qquad
+\dot{\theta}_R = \frac{\omega_R \ r_R}{R_R}
+\end{equation*}
+
+Jeśli promienie kół się nieznacznie różnią, do wyznaczenia prędkości $\dot{\theta}$ pojazdu można wykorzystać średnią z $\dot{\theta}_L$ i $\dot{\theta}_R$
+
+\subsection*{zad. 3}
+
+Znów można zastosować podobne wzory. Przez $\gamma_{S}$ oznaczono promień skrętu dla samochodu ($L$ = 4 m), a przez $\gamma_A$ -- promień skrętu dla autobusu ($L$ = 12 m).
+\begin{table}[htbp!]
+	\centering
+	\begin{tabular}{c||c|c|c}
+		$R \ [\text{m}]$ &
+			10 & 20 & 50 \\
+			\hline\hline
+		$\gamma_{S} \ [\text{rad}]$ &
+			0.3805 & 0.1974 & 0.0798 \\
+		$\gamma_{A} \ [\text{rad}]$ &
+			0.8761 & 0.5404 & 0.2355
+	\end{tabular}
+\end{table}
+
+\subsection*{zad. 4}
+
+Trajektorie dla badanych stałych kątów skrętu $\gamma$ umieszczone są na rysunku \ref{fig:mobile3t}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{mobile3_img1}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{mobile3_img2}%
+	}%
+	\hfill%
+		\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{mobile3_img3}%
+	}%
+	
+	\caption{Trajektorie \label{fig:mobile3t}}
+\end{figure}
+
+\subsection*{zad. 5}
+
+Przykładowa implementacja operatora ,,minus w kole'', inaczej funkcji \texttt{angdiff} w MATLABie.
+\begin{lstlisting}
+function ret = minusOperator(alpha, beta)
+    % Różnica pomiędzy kątami.
+    diff = alpha - beta;
+    
+    % Różnicę należy sprowadzić do przedziału [-pi, pi). W zależności
+    % od tego ile aktualnie wynosi, rozważono 3 przypadki.
+    if diff >= pi
+        tmp = ceil((diff - pi) / (2*pi));
+        ret = diff - tmp * 2*pi;
+    elseif diff < -pi
+        tmp = floor((diff + pi) / (2*pi));
+        ret = diff - tmp * 2*pi;
+    else
+        ret = diff;
+    end
+end
+\end{lstlisting}
+
+\subsection*{zad. 6}
+
+Przebiegi czasowe widać na rysunku \ref{fig:mobile6img}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5 \linewidth]{mobile6_img}
+	\caption{Przebiegi $x$, $y$ i $\theta$ względem czasu $t$ \label{fig:mobile6img}}
+\end{figure}
+
+\subsection*{zad. 7}
+
+\subsubsection*{a)}
+
+\begin{itemize}
+\item Zmiany odległości \emph{look-ahead} powodowały zauważalne zmiany w trajektorii pojazdu -- im dystans był mniejszy, tym ślad trasy pozostawianej przez pojazd dokładniej pokrywał się z trajektorią ruchomego celu.
+\item Zmiany wzmocnienia (\emph{heading gain}) regulatora kąta skrętu działały odwrotnie -- im wzmocnienie było większe, tym obliczany kąt skrętu był gwałtowniejszy, przez co trajektorie (pojazdu i celu) lepiej ze sobą się pokrywały. Gdy wzmocnienie zostało gwałtownie zmniejszone, wyznaczane kąty skrętu były na tyle małe, że pojazd nie zawsze potrafił nadążyć za zmianą trasy ruchomego celu i oscylował względem niej.
+\item Zmiany wzmocnienia części P regulatora prędkości nie miały dużego wpływu na samą trajektorię pojazdu. Wpływ widoczny jest przy analizie z perspektywy czasu -- gdy cel zmienia swoją trasę, pojazd proporcjonalnie do wzmocnienia P zwiększa swoją prędkość.
+\end{itemize}
+
+\subsubsection*{b)}
+
+Gdy ustawiono wzmocnienie części I na zero, nie uzyskano zadanego dystansu od celu w stanie ustalonym (ale pojazd jest w stanie podążać za celem w linii prostej) -- występuje stały błąd o pewnej wartości. Jest to naturalna konsekwencja wyłączenia całkowania w regulatorze.
+
+\subsubsection*{c)}
+
+W tej sytuacji, stały błąd w stanie ustalonym zależy od wzmocnienia części P -- przy wzmocnieniu dążącym do nieskończoności, błąd ten dąży do zera. Wraz ze wzrostem $K_P$ zaczynają jednak pojawiać się inne niepożądane zjawiska (np. przeregulowania), więc można je zwiększyć tylko do pewnego stopnia.
+
+% \subsubsection*{d)}
+
+%
+% ? ??? ?? ? ? ? ?
+%
+
+\subsubsection*{e)}
+
+By robot poruszał się slalomem, określono ruchy celu tak, by jego trajektoria przypominała sygnał trójkątny (rysunek \ref{fig:mobile7e}).
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[przykładowe ustawienia]{%
+		\includegraphics[width = 0.45\linewidth]{mobile7_img1}%
+	}%
+	\hfill%
+	\subfloat[trajektorie]{%
+		\includegraphics[width = 0.45\linewidth]{mobile7_img2}%
+	}%
+	
+	\caption{Slalom \label{fig:mobile7e}}
+\end{figure}
+
+\subsubsection*{f)}
+
+Ponownie należy odpowiednio przystosować punkty trajektorii ruchomego celu do tego zadania. Tym razem podawano na przemian dwa punkty (rysunek \ref{fig:mobile7f}).
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[przykładowe ustawienia]{%
+		\includegraphics[width = 0.45\linewidth]{mobile7_img4}%
+	}%
+	\hfill%
+	\subfloat[trajektorie]{%
+		\includegraphics[width = 0.45\linewidth]{mobile7_img3}%
+	}%
+	
+	\caption{Ruch\label{fig:mobile7f}}
+\end{figure}
+
+\subsection*{zad. 8}
+
+\subsubsection*{a)}
+
+Zgodnie z prośbą autora książki, wykonano przykład ponownie dla innych orientacji początkowych. Kilka testów widać na rysunku \ref{fig:mobile8a}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{mobile8_img5}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{mobile8_img1}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.3 \linewidth]{mobile8_img2}%
+	}%
+
+	\caption{Wpływ orientacji początkowych $\theta$ na trajektorię \label{fig:mobile8a}}
+\end{figure}
+
+Dla takich warunków początkowych i takiego położenia/orientacji celowej, zmiana orientacji początkowej nie wpływa na kierunek ruchu pojazdu, tzn. pojazd zawsze porusza się do tyłu%
+\footnote{Dobrze to widać na wykresach, które automatycznie uruchamiają się wraz z symulacją w Simulinku,
+ale niestety nie da się ich osobno zapisać.}
+.
+
+\subsubsection*{b)}
+
+Manewr parkowania równoległego odtworzono poprzez odpowiedni dobór pozycji początkowych i końcowych.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5 \linewidth]{mobile8_para}
+	\caption{Parkowanie równoległe}
+\end{figure}
+
+\subsubsection*{c)}
+
+\begin{itemize}
+\item Zmiany wzmocnienia $k_{\rho}$ wpływały na prędkość pojazdu -- im większe wzmocnienie tym szybciej się on poruszał, oczywiście uwzględniając także odległość od samego celu, gdyż prędkość jest do niej proporcjonalna. W przypadku bardzo niskich wzmocnień należało zwiększyć horyzont symulacji, gdyż domyślny nie wystarczał. Dla dużych wzmocnień pojazd, będąc już blisko celu, wciąż poruszał się na tyle szybko, że pozostałe składowe algorytmu sterowania nie były w stanie zapobiec nadmiernym skrętom i oscylacjom.
+\item Zmiana wzmocnienia $k_{\alpha}$, podobnie jak $k_{\rho}$ wpływała na sposób dotarcia do celu, choć w sposób łatwiej zauważalny. Zwiększanie tego wzmocnienia powoduje, że trajektoria jest bardziej płaska, bardziej przypomina linię prostą -- robot wtedy szybciej osiąga odpowiednią orientację, która pozwoli mu dotrzeć do celu.
+\item Wzmocnienie $k_{\beta}$, tak jak i $k_{\alpha}$ ingeruje w prędkość kątową pojazdu, ale to wzmocnienie tak oblicza sygnał, by orientacja robota w punkcie celu pokrywała się z zadaną. Odpowiednio dobierając wzmocnienia $k_{\alpha}$ i $k_{\beta}$ można osiągnąć podobne rezultaty.
+\end{itemize}
+
+\subsection*{zad. 9}
+
+Na rysunku poniżej pokazane zostało okno prostej aplikacji do sterowania pojazdem, który jest modelowany poprzez rower.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{mobile9_img1}
+	\caption{GUI do sterowania pojazdem}
+\end{figure}
+
+Pojazdem sterowano przesuwając suwakami: pierwszy z nich dotyczy prędkości liniowej pojazdu (\emph{v Slider}), drugi dotyczący kątu skrętu (\emph{gamma Slider}). Ponad suwakami znajduje się mapa, która aktualizuje się co stały krok czasu, a na nią nanoszone są kolejne punkty, określające aktualne położenie pojazdu.
+
+\subsection*{zad. 10}
+
+By przystosować regulatory omówione w podanym rozdziale do pracy z pojazdem wyposażonym w napęd różnicowy, należy zaobserwować kluczową różnicę pomiędzy nim a pojazdem 4-kołowym: sterowanie pojazdem 4-kołowym odbywa się poprzez regulację prędkości liniowej $v$ oraz kąta skrętu $\gamma$, a pojazdem z napędem różnicowym -- poprzed regulację prędkości liniowych obu kół $v_L$, $v_R$.
+By zaobserwować jak te zmiany wpłyną na dobierane regulatory, rozpatrzono dla przykładu punkt poświęcony docieraniu pojazdu do celu.
+
+Prędkości liniowej pojazdu jest wyznaczana w ten sam sposób, co w rozdziale:
+\begin{equation*}
+v^{*} = K_v \sqrt{(x^{*} - x)^2 + (y^{*} - y)^2}
+\end{equation*}
+
+gdzie: $(x^{*}, y^{*})$ -- położenie celu, $(x, y)$ -- położenie robota, $K_v$ -- wzmocnienie. Tym razem jednak tę prędkość należy podać dla obu kół pojazdu, zatem na tym etapie:
+\begin{equation*}
+v_L = v_R = v^{*}
+\end{equation*}
+
+Teraz trzeba uwzględnić orientację robota:
+\begin{equation*}
+\theta^{*} = \tan^{-1} \left( \frac{y^{*} - y}{x^{*} - x} \right)
+\end{equation*}
+
+Poprzednio korzystając z tej pożądanej orientacji wyznaczany był kąt skrętu $\gamma$%
+\footnote{Przez symbol $\ominus$ oznaczono użyty w instrukcji symbol ,,minusa w kole'', który oznacza użycie funkcji \texttt{angdiff} w MATLABie}%
+:
+\begin{equation*}
+\gamma = K_h ( \theta^{*} \ominus \theta )
+\end{equation*}
+
+Tym razem użyto tego samego wyrażenia, ale by wyznaczyć odpowiednią różnicę prędkości kół pojazdu. Zatem, ostatecznie:
+\begin{equation*}
+v_L =
+	\begin{cases}
+	v^{*} &
+		\qquad \gamma \le 0 \\
+	v^{*} - \gamma &
+		\qquad \gamma > 0 
+	\end{cases}
+\qquad\qquad
+v_R =
+	\begin{cases}
+	v^{*} &
+		\qquad \gamma \ge 0 \\
+	v^{*} + \gamma &
+		\qquad \gamma < 0 
+	\end{cases}
+\end{equation*}
+
+Chodzi zatem o to, że $v^{*}$ wyznacza pewien poziom prędkości bazowej, wyznaczanej względem celu, a $\gamma$ zmniejsza \emph{tylko jedną z prędkości}, by uzyskać odpowiednią orientację.
+
+\subsection*{zad. 11}
+
+Wiadomo, że:
+\begin{equation*}
+\dot{\theta} = \frac{v_L}{R_L} = \frac{v_R}{R_R}
+\end{equation*}
+
+Wartości $R_L$ i $R_R$ są ze sobą powiązane poprzez odległość $W$, która oznacza dystans dzielący oba koła:
+\begin{equation*}
+R_R = R_L + W \qquad\qquad R_L = R_R - W
+\end{equation*}
+
+Stosując takie podstawienie do wzorów powyżej otrzymano:
+\begin{gather*}
+\frac{v_L}{R_L} = \frac{v_R}{R_L + W} \\
+v_L (R_L + W) = v_R R_L \\ 
+R_L (v_L - v_R) + w V_L = 0 \\
+\frac{v_L - v_R}{W} = - \frac{v_L}{R_L} \\
+\frac{v_R - v_L}{W} = \frac{v_L}{R_L}
+\end{gather*}
+
+Iloraz $\frac{v_L}{R_L}$ z definicji oznacza $\dot{\theta}$, zatem:
+\begin{equation*}
+\frac{v_R - v_L}{W} = \dot{\theta}
+\end{equation*}
+
+\subsection*{zad. 12}
+
+Zakładając pewną odległość pomiędzy kołami $W$ = 1m, wykreślono wykresy.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{mobile12_img1}
+	\caption{Prędkości $v_L$, $v_R$ w funkcji promienia okręgu ICR}
+\end{figure}
+
+Czarną linią oznaczony został kluczowy punkt -- środek okręgu, czyli punkt ICR, leży dokładnie \emph{pod} jednym z kół, w tym przypadku pod kołem lewym. W takiej sytuacji ta prędkość jest zerowa ($v_L = 0$), a robot obraca się korzystając tylko z drugiego koła. Natomiast gdy promień koła jest jeszcze mniejszy, czyli środek okręgu leży gdzieś pod robotem, prędkość $v_L$ zmienia znak.
+
+W przypadku drugiego koła, prędkość cały czas odpowiednio się zmienia, ale ciągle ma znak dodatni. Analogiczne rozważania można przeprowadzić dla skrętu w drugą stronę.
+
+\subsection*{zad. 13}
+
+Jeśli robotowi wyposażonemu w napęd różnicowy zada się, by poruszał się ze stałą prędkością wzdłuż jego osi y, to robot zacznie się obracać w miejscu. Oś y przebiega wzdłuż osi kół, i zmienia ona swoje położenie wraz ze zmianą położenia robota.
+
+\subsection*{zad. 14}
+
+Struktura pojazdu widoczna jest na rysunku \ref{fig:mobile14pojazd}.
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width = 0.3 \linewidth]{mobile14_sketch}
+	\caption{Szkic pojazdu \label{fig:mobile14pojazd}}
+\end{figure}
+
+Platforma pojazdu to koło o pewnym promieniu. 3 koła są rozmieszczone tak, że ich osie przecinają się w jednym punkcie.
+
+Robot porusza się korzystając ze szwedzkich kół, których szkice pokazane są na rysunku \ref{fig:mobile14kola}.
+\begin{figure}[htb!]
+	\centering
+
+	\subfloat[widok z góry]{%
+		\includegraphics[width = 0.15 \linewidth]{mobile14_sketch2}%
+	}%
+	\phantom{%
+		\includegraphics[width = 0.1 \linewidth]{mobile14_sketch2}%
+	}%
+	\subfloat[widok z dołu]{%
+		\includegraphics[width = 0.15 \linewidth]{mobile14_sketch3}%
+	}%
+	
+	\caption{Koła robota \label{fig:mobile14kola}}
+\end{figure}
+
+Na rysunku b, przedstawiona jest jedna rolka, która ma kontakt z podłożem w danej chwili. Umieszczona ona jest pod kątem $\alpha = 45^{\circ}$ względem osi koła.
+
+Kod, który przekształca zadane prędkości liniowe i obrotowe pojazdu na prędkości obrotowe kół platformy pokazany jest poniżej.
+\begin{lstlisting}
+clear; close; clc;
+
+% Parametry pojazdu.
+alpha = 45 * pi/180;
+r = 0.4;
+R = 0.1;
+
+% Zadane prędkości.
+v_star = [1, 0, 0]';
+omega_star = 0.5;
+
+% Wektory p, określające położenie kół względem układ współrzędnych B.
+p_1 = [1, 0, 0]';
+p_2 = [-sin(30 * pi/180), -cos(30 * pi/180), 0]';
+p_3 = [-sin(30 * pi/180), cos(30 * pi/180), 0]';
+
+% Wyznaczanie pożądanych prędkości liniowych dla każdego koła.
+v_1 = v_star + cross(omega_star * [0, 0, 1]', p_1);
+v_2 = v_star + cross(omega_star * [0, 0, 1]', p_2);
+v_3 = v_star + cross(omega_star * [0, 0, 1]', p_3);
+
+% Wyznaczanie prędkości obrotowych dla każdego koła.
+v_1_w = (v_1(1) - v_1(2) * cot(alpha)) / R
+v_2_w = (v_2(1) - v_2(2) * cot(alpha)) / R
+v_3_w = (v_3(1) - v_3(2) * cot(alpha)) / R
+\end{lstlisting}
+
+\subsection*{zad. 15}
+
+Schemat pojazdu z zadania widoczny jest na rysunku \ref{fig:mobile15pojazd}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.4\linewidth]{mobile15_img1}
+	\caption{Schemat pojazdu \label{fig:mobile15pojazd}}
+	Źródło: książka, strona nr 113, rysunek 4.18.b
+\end{figure}
+
+Układ \{B\} związany z pojazdem umieszczony jest w jego środku geometrycznym i porusza/obraca się wraz z ruchem robota. By zrealizować ruch pojazdu po okręgu, należy:
+\begin{itemize}
+\item ustalić pewną stałą wartość prędkości liniowej układu \{B\} względem jego osi y,
+\item ustalić pewną stałą wartość prędkości obrotowej robota.
+\end{itemize}
+
+W ten sposób pojazd będzie poruszał się ze stałą prędkością w kierunku jego osi y, oś ta będzie obracała się wraz z prędkością obrotową. W ten sposób oś x układu będzie cały czas wskazywała środek okręgu.
+
+Teraz trzeba odpowiednio dobrać prędkości ${}^{B}v_y$ i ${}^{B}\omega$, by zadany ruch był realizowany po okręgu o promieniu 0.5m.
+\begin{align*}
+\text{promień:} & \qquad r = 0.5 \ \text{m} \\
+\text{obwód:} & \qquad L = 2\pi r = \pi \ \text{m}
+\end{align*}
+
+Założono pewną stałą wartość prędkości liniowej:
+\begin{equation*}
+{}^{B}v_y = \frac{\pi}{4} \ \mPERs
+\end{equation*}
+
+Jeśli w ciągu sekundy robot pokona taki dystans, to oznacza to, że pokona 1/4 obwodu koła -- zatem jego orientacja musi się w ciągu sekundy zmienić o $90^{\circ}$, czyli:
+\begin{equation*}
+{}^{B}\omega = \frac{\pi}{2} \radPERs
+\end{equation*}
+
+Korzystając z kodu przedstawionego dla poprzedniego zadania, można obliczyć prędkości kątowe dla wszystkich 4 kół robota, które pozwolą mu poruszać się w taki sposób.
+\begin{lstlisting}
+clear; close; clc;
+
+% Parametry pojazdu: kąty rolek, promień koła.
+alpha_1 = 45 * pi/180;
+alpha_2 = -alpha_1;
+R = 0.1;
+
+% Zadane prędkości.
+v_star = [0, 1, 0]';
+omega_star = 0.5;
+
+% Wektory p, określające położenie kół względem układu współrzędnych B.
+p_1 = [1, 0.5, 0];
+p_2 = [1, -0.5, 0];
+p_3 = [-1, -0.5, 0];
+p_4 = [-1, 0.5, 0];
+
+% Wyznaczacznie pożądanych prędkości liniowych dla każdego koła.
+v_1 = v_star + cross(omega_star * [0, 0, 1]', p_1);
+v_2 = v_star + cross(omega_star * [0, 0, 1]', p_2);
+v_3 = v_star + cross(omega_star * [0, 0, 1]', p_3);
+v_4 = v_star + cross(omega_star * [0, 0, 1]', p_4);
+
+% Wyznaczenia prędkości obrotowych dla każdego koła.
+v_1_w = (v_1(1) - v_1(2) * cot(alpha_2)) / R
+v_2_w = (v_2(1) - v_2(2) * cot(alpha_1)) / R
+v_3_w = (v_3(1) - v_3(2) * cot(alpha_2)) / R
+v_4_w = (v_4(1) - v_4(2) * cot(alpha_1)) / R
+\end{lstlisting}
+
+Założono, że platforma pojazdu to prostokąt o wymiarach: 1m x 0.5m, a korzystając z tego założenia wyznaczono wektory $\mathbf{p}$ określające położenie kół. Założono też pewien promień kół pojazdu: 0.1m. Ostateczna odpowiedź to:
+\begin{equation*}
+\omega_1 = 7.5 \radPERs, \quad
+\omega_2 = -10 \radPERs, \quad 
+\omega_3 = 12.5 \radPERs, \quad 
+\omega_4 = -10 \radPERs,
+\end{equation*}
+
+\subsection*{zad. 16}
+
+\subsubsection*{a)}
+
+By czterowirnikowiec znajdował się w punkcie równowagi pionowej, jego całkowita siła ciągu musi być równa sile ciążenia, zatem musi zachodzić:
+\begin{equation*}
+T = -mg
+\end{equation*}
+
+gdzie: $T$ -- całkowita siła ciągu, $m$ -- masa quadrotora, $g$ -- przyspieszenie ziemskie.
+
+Równanie macierzowe pozwalające wyznaczyć prędkości śmigieł to:
+\begin{equation*}
+	\begin{bmatrix}
+	\varpi_1^2 \\
+	\varpi_2^2 \\
+	\varpi_3^2 \\
+	\varpi_4^2
+	\end{bmatrix}
+	=
+	\mathbf{A}^{-1}
+	\begin{bmatrix}
+	T \\ \tau_x \\ \tau_y \\ \tau_z
+	\end{bmatrix}
+\end{equation*}
+
+W omawianym przypadku, momenty $\tau_x$, $\tau_y$, $\tau_z$ są równe zero.
+Macierz $\mathbf{A}$ to:
+\begin{equation*}
+\mathbf{A} =
+	\begin{bmatrix}
+	-b & -b & -b & -b \\
+	0 & -db & 0 & db \\
+	db & 0 & -db & 0 \\
+	k & -k & k & -k
+	\end{bmatrix}
+\end{equation*}
+
+Ostatecznie rozwiązaniem są prędkości:
+\begin{equation*}
+\varpi_i = \sqrt{\frac{mg}{4b}} \qquad i \in \{1, 2, 3, 4\}
+\end{equation*}
+
+Współczynnik $b$ to wartość stała, określająca zależność siły ciągu od prędkości obrotowej śmigła.
+
+\subsubsection*{b)}
+
+W systemie sterowania znajdują się w sumie 4 regulatory PD:
+\begin{itemize}
+\item wyznaczanie całkowitej siły ciągu dla zadanej wysokości (\emph{Height control}),
+\item wyznaczanie momentu względem osi z dla zadanego kąta yaw (\emph{Yaw control}),
+\item wyznaczanie kątów pitch i roll dla pożądanego wektora prędkości (\emph{Velocity control}),
+\item wyznaczanie momentów względem osi x i y dla zadanych kątów pitch i roll (\emph{Attitude control}).
+\end{itemize}
+
+Jeśli są 4 regulatory PD, to znaczy że w sumie potrzeba dobrać 8 nastaw. Wektor stanu quadrotora zawiera 12 składowych. Trudno jest przeprowadzić kompletną analizę, która wskaże, jaka poszczególne nastawy wpłyną jak na wszystkie składowe..
+Zaobserwowano, że:
+\begin{itemize}
+\item dla regulatora \emph{Height control}: \hspace{0.2cm}
+Zmniejszanie wzm. P powodowało większe oscylacje wysokości pojazdu i dłuższe ustalanie się wartości zadanej, natomiast zwiększenie jej poprawiło jakość regulacji -- przeregulowanie znacznie się zmniejszyło. Zwiększanie wzm. D także poprawiło jakość regulacji poprawiając dynamikę sygnału -- krócej trwała faza przejściowa.
+\item dla regulatora \emph{Yaw control}: \hspace{0.2cm}
+Zmiany wzm. P prawie w ogóle nie wpłyneły podążanie za zadanym kątem yaw, który narastał liniowo. Zmiany D miały dużo większe znaczenie -- im większe wzmocnienie D tym kąt yaw zmieniał się z mniejszą prędkością, czyli powodowało to gorsze nadążanie za sygnałem zadanym. Wzmocnienie to nie moze być jednak zerowe, bo wtedy kąt yaw obiektu silnie oscyluje względem sygnału zadanego.
+\item dla regulatora \emph{Velocity control}: \hspace{0.2cm}
+Zwiększanie wzm. P powodowało, że kąty pitch i roll obiektu zmieniały się ze znacznie większą częstotliwością. Zmiany D miały jednak większy wpływ na zmiany tych kątów -- zmniejszenie tego wzm. powodowało, że wirnikowiec zaczynał wykonywać trajektorię koła o coraz większym promieniu, zaczynał uciekać z zadanej trajektorii.
+\item dla regulatora \emph{Attitude control}: \hspace{0.2cm}
+Zmiany wzm. P nie powodowały zmian żadnej ze składowych wektora stanu (być może wynikało to z zadanych parametrów). Zmiany D wpływały natomiast na wiele składowych stanu drona, co -- upraszczając -- powodowało, że nie zawsze poprawnie śledził zadaną trajektorię, szczególnie gdy badano większe (względem domyślnego) wzmocnienia.
+\end{itemize}
+
+\subsubsection*{c)}
+
+Wpływ zmian wzmocnienia P, przy usunięciu składnika sprzężenia w przód, na wysokość quadrotora widać na rysunku \ref{fig:mobile16c}.
+\begin{figure}[htb!]
+	\centering
+	\includegraphics[width = 0.4 \linewidth]{mobile16c_img1}
+	\caption{Wpływ P na osiąganą wysokość \label{fig:mobile16c}}
+\end{figure}
+
+Gdy usunięto składnik $T_0 \approx mg$, który zapewnia pionową równowagę, w stanie ustalonym wysokość nie osiągnęła wartości zadanej. Zwiększanie wzmocnienia zmniejsza ten błąd, ale i tak cały czas występuje.
+
+\subsubsection*{d)}
+
+Całkowita siła ciągu wyznaczana przez regulator wysokości to: $\mathbf{T} = \left[0 \ 0 \ T \right]^{T}$. Regulator wyznacza siłę ciągu na podstawie kąta yaw oraz jego pochodnej, natomiast nie bierze pod uwagę kątów pitch i roll. Kąty te wpływają na orientację wirnikowca, przez co wektor $\mathbf{T}$ nie jest skierowany prostopadle do podłoża, zgodnie z równaniem macierzowym:
+\begin{equation*}
+\mathbf{R}_{\text{x}, \text{y}, \text{z}}(\phi, \theta, \psi) \cdot
+	\begin{bmatrix}
+	0 \\ 0 \\ T
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+	T_x \\ T_y \\ T_z
+	\end{bmatrix}
+\end{equation*}
+
+gdzie: $\phi$ -- pitch, $\theta$ -- roll, $\psi$ -- yaw.
+
+Jeśli kąty pitch lub roll są niezerowe, wtedy $T \neq T_z$. By jednak wymusić tę równość we wspomnianych przypadkach, można odwrócić macierz rotacji $\mathbf{R}$, a następnie znaleźć rząd odpowiedzialny za $T_z$. Ostatecznie, by osiągnąć zamierzony cel, wyznaczoną przez regulator siłę ciągu T przepuszczono przez wyrażenie:
+\begin{equation*}
+T^{*} = T \cdot \left( \cos(\phi) \cdot \cos(\theta) \right)^{-1}
+\end{equation*}
+
+Omówioną modyfikację w Simulinku widać na schemacie poniżej.
+\begin{figure}[htbp!]
+	\centering
+	\fbox{\includegraphics[width = 0.75\linewidth]{mobile16_imgX}}
+	\caption{Modyfikacja schematu}
+\end{figure}
+
+\subsubsection*{e)}
+
+Z symulacją lotu wirnikowca do góry nogami wystąpiły duże problemy. Wypróbowano wiele pomysłów:
+\begin{itemize}
+\item wymuszano zadany kąt 180 stopni na jednym z kątów orientacji pojazdu,
+\item starano się sterować pojazdem poprzez zadawanie odpowiednich momentów $\tau_x$, $\tau_y$, $\tau_z$,
+\item wyłączano regulator wysokości i zadawano stałą siłę ciągu,
+\item umożliwiono śmigłom obrót w drugą stronę,
+\item zmieniano wzmocnienia w regulatorach (tych, których nie wyłączono).
+\end{itemize}
+
+Niestety, nie udało się uzyskać zamierzonych celów w zadowalającym stopniu. Być może pomysły były niewłaściwe, a być może symulator nie był przygotowany do tego zadania.
+Najlepszy rezultat widoczny jest na rysunku \ref{fig:mobile16e}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = 0.4\linewidth]{mobile16e_img1}%
+	}%
+	\hfill%
+	\subfloat[]{%
+		\includegraphics[width = 0.4\linewidth]{mobile16e_img2}%
+	}%
+	
+	\caption{Próby lotów do góry nogami \label{fig:mobile16e}}
+\end{figure}
+
+Jak widać obrót na drugą stronę udało się uzyskać, ale później pomimo wielu prób nie udało się opanować spadającego pojazdu.
+
+\subsubsection*{f)}
+
+Ruch balistyczny zaprogramowano w następujący sposób:
+\begin{itemize}
+\item rozwarto sprzężenie zwrotne -- sterowanie w układzie otwartym,
+\item zadane kąty orientacji pojazdu ustawiono jako wartości stałe:
+\begin{equation*}
+\pitch = \yaw = 0^{\circ}, \qquad \roll = 45^{\circ},
+\end{equation*}
+\item całkowitą siłę ciągu na początku zadano jako pewną dużą wartość: po pierwsze, musi być ona większa od siły ciążenia, a po drugie musi być wystarczająco duża, by podczas zmiany nachylenia pojazdu względem ziemi rzut wektora siły ciągu na płaszczyznę xy układu związanego z powierzchnią wciąż był większy od siły ciążenia. Następnie, w pewnej chwili -- wybrano 5 sekund -- wyłączono napędy.
+\end{itemize}
+
+Rezultat widać na rysunku \ref{fig:mobile16f}.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[płaszczyzna XY]{%
+		\includegraphics[width = 0.4 \linewidth]{mobile16f_img1}%
+	}%
+	\hfill%
+	\subfloat[wysokość]{%
+		\includegraphics[width = 0.4 \linewidth]{mobile16f_img2}%
+	}%
+	
+	\caption{Ruch balistyczny \label{fig:mobile16f}}
+\end{figure}
+
+Co ciekawe, wirnikowiec nie porusza się jedynie względem osi x -- w bardzo niewielkim stopniu zmienia się także składowa y jego położenia. Wysokość zmienia się zgodnie z oczekiwaniami -- w okolicach 5 sekundy wyłączony zostaje napęd, prędkość pojazdu względem ziemi zaczyna maleć, aż w końcu staje się ujemna i wirnikowiec spada.
+
+\subsubsection*{g)}
+
+By zrealizować gładkie lądowanie, należy poprawnie dobrać nastawy regulatora PD wyznaczającego siłę ciągu dla osiągnięcia zadanej wysokości -- nie może być przeregulowań.
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width = 0.4 \linewidth]{mobile16g_img1}
+	\caption{Gładkie lądowanie}
+\end{figure}
+
+W stanie ustalonym jest minimalny uchyb -- jest to konsekwencja zastosowania regulatora PD bez członu I. By go zmniejszyć można dodać wspomniany człon, lub zmienić wartość składnika sprzężenia w przód, które ustala stały poziom siły ciągu równoważącej siłę ciążenia (ta domyślna jest wpisana nieco niedokładnie).
+
+\subsubsection*{h)}
+
+Manewr nazywany ,,beczką'' czy ,,barrel roll'' wykonano, zgodnie z instrukcją, w następujący sposób:
+\begin{itemize}
+\item pojazd, który znajduje się w stanie równowagi pionowej, lekko przechylono (kąt pitch), a następnie ustawiono ten kąt z powrotem na 0. W ten sposób pojazd zyskuje pewną wolno gasnącą prędkość w kierunku osi x,
+\item następnie, po kilku sekundach, gwałtownie zmieniono kąt roll z 0 na $360^{\circ}$.
+\end{itemize}
+
+Efekty tych eksperymentów widać na rysunkach poniżej.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[trajektoria]{%
+		\includegraphics[width = 0.24 \linewidth]{mobile16h_img1}%
+	}%
+	\hfill%
+	\subfloat[wysokość]{%
+		\includegraphics[width = 0.24 \linewidth]{mobile16h_img4}%
+	}%
+	\hfill%
+	\subfloat[pitch]{%
+		\includegraphics[width = 0.24 \linewidth]{mobile16h_img2}%
+	}%
+	\hfill%
+	\subfloat[roll]{%
+		\includegraphics[width = 0.24 \linewidth]{mobile16h_img3}%
+	}%
+	
+	\caption{Barrel roll \label{fig:mobile16h}}
+\end{figure}
+
+Wirnikowiec po lekkim przechyleniu (kąt pitch) uzyskał pewną prędkość $v_x$. Później dokonano gwałtownej zmiany kątu roll. Zmiana ta wpływa znacząco na wysokość pojazdu, który spada, ale później odzyskuje wysokość. Spowodowało to także zmiany trajektorii lotu. Być może eksperymenty były prowadzone przy zbyt niskich prędkościach, przez co niesymetryczne ułożenie pojazdu w trakcie ,,beczki'' spowodowało rozłożenie prędkości liniowej na dwie składowe. Próbowano zmieniać prędkości, a także parametry regulatorów, ale nie do końca udało się całkowicie zapobiec temu zjawisku.
+
+\subsubsection*{i)}
+
+To zadanie jest analogiczne co do poprzedniego, z jedną drobną różnicą:
+\begin{itemize}
+\item pojazd, który znajduje się w stanie równowagi pionowej, lekko przechylono (kąt pitch), a następnie ustawiono ten kąt z powrotem na 0. W ten sposób pojazd zyskuje pewną wolno gasnącą prędkość w kierunku osi x,
+\item następnie, po kilku sekundach, gwałtownie zmieniono kąt \emph{pitch} z 0 na $360^{\circ}$.
+\end{itemize}
+
+Niestety, symulator nie jest przygotowany do tych eksperymentów -- kąt pitch może zmieniać się tylko od $-180^{\circ}$ do $180^{\circ}$, przez co wprowadzona zmiana powoduje niekończące się obracanie.
+
+\subsubsection*{j)}
+
+Do zmiany liczy wirników trzeba wykorzystać inny blok opisujący dynamikę pojazdu oraz inny blok wyznaczający prędkości wirnków dla pożądanych momentów. W MATLABie użyto polecenia \texttt{roblocks}, co otworzyło w Simulinku panel z różnymi blokami związanymi z toolboxem. Kliknięto w zakładkę \emph{Vehciles}, a następnie wybrano:
+\emph{N-Rotor} oraz \emph{Control Mixer N}. Te bloki umieszczono dokładnie w tych samych miejscach, gdzie były podobne bloki, które dotyczyły quadrotora.
+
+Wspomniane bloki trzeba zparametryzować poprzez wprowadzenie liczby wirników (w naszym przypadku 8). Także model wirnikowca, wprowadzony do MATLABa poprzez komendę \texttt{mdl\_quadrotor}, należy zmodyfikować zmieniając wartość pola \texttt{nrotors} na 8.
+
+Teoretycznie te zmiany powinny wystarczyć do przeprowadzenia pierwszych testów, ale jak się okazało należy także wprowadzić inne zmiany:
+\begin{itemize}
+\item w bloku \emph{N-Rotor} wybrano \emph{Dynamics} i zmieniono nazwę parametru \texttt{ground} na \texttt{groundflag},
+\item należy też zmodyfikować kod bloku symulującego dynamikę, co uzyskano klikając w \emph{Edit} -- w linijce 131 dodano zmienną globalną \texttt{globalFlag}. Linijka po zmianach powinna wyglądać tak:
+\begin{lstlisting}[firstnumber = 131]
+	global a1s b1s groundFlag
+\end{lstlisting}
+\end{itemize}
+
+Teraz program powinien działać poprawnie, choć by wirnikowiec się odpowiednio poruszał, należy zmienić wzmocnienia regulatorów.
+
+\subsubsection*{k)}
+
+By zrealizować zadanie podążania wzdłuż trajektorii można posłużyć się blokiem \emph{trajectory}, który wykorzystywany był w innej symulacji Simulinka (\texttt{sl\_pursuit}).
+
+Na rysunkach poniżej przedstawiony został sposób dodania bloku do schematu oraz parametry bloku.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[schemat]{%
+		\fbox{\includegraphics[width = 0.35 \linewidth]{mobile16k_img3}}%
+	}%
+	\hfill%
+	\subfloat[parametry]{%
+		\fbox{\includegraphics[width = 0.35 \linewidth]{mobile16k_img4}}%
+	}%
+	
+	\caption{Blok \emph{trajectory}}
+\end{figure}
+
+W parametryzacji istotne są dwa pola:
+\begin{itemize}
+\item \emph{Path} -- macierz o 4 kolumnach ($x$, $y$, $z$, $\theta$) określających punkty pośrednie trajektorii,
+\item \emph{Segment Times} -- czas dla każdej części trajektorii.
+\end{itemize}
+
+Punkty łączone są ze sobą liniami prostymi.
+
+Następnie należy zmienić wzmocnienia regulatorów w systemie sterowania, tak by lepiej radziły sobie z nadążaniem. Domyślne wzmocnienia co prawda zapewniają płynne przejście z jednego miejsca na drugie, ale przy nadążaniu można zezwolić na większe przeregulowania, co umożliwi uzyskanie lepszych wskaźników czasowych.
+
+Na rysunkach \ref{fig:mobile16k} widać efekty pracy.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[płaszczyzna XY]{%
+		\fbox{\includegraphics[width = 0.35 \linewidth]{mobile16k_img1}}%
+	}%
+	\hfill%
+	\subfloat[wysokość]{%
+		\fbox{\includegraphics[width = 0.35 \linewidth]{mobile16k_img2}}%
+	}%
+	
+	\caption{Podążanie za trajektorią \label{fig:mobile16k}}
+\end{figure}
+
+\end{document}

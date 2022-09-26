@@ -1,0 +1,530 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage{polski}
+\usepackage{geometry}
+	\geometry{margin = 2.5cm}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{bold-extra}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{graphicx}
+\usepackage[unicode, colorlinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage[shortlabels]{enumitem}
+	\setlist[itemize]{--, itemsep = 0cm}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage[labelfont = bf]{caption}
+
+\linespread{1.3}
+
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+
+\lstdefinestyle{mystyle}{%
+	backgroundcolor = \color{backcolour},
+%	basicstyle = \ttfamily \small,
+ 	basicstyle = \ttfamily \footnotesize,
+	commentstyle = \color{green!50!black},
+	numberstyle = \tiny \color{codegray},
+	stringstyle = \color{codepurple},
+	keywordstyle = \color{blue!85!black},
+	breakatwhitespace = false,
+	breaklines = true,
+	captionpos = b,
+	keepspaces = true,
+	showspaces = false,
+	showstringspaces = false,
+	showtabs = false,
+	tabsize = 4,
+	numbers = left,
+	numberstyle = \tiny \color{black},
+	morecomment = [l]{\%},
+	frame = single
+}
+
+\lstset{
+	style = mystyle,
+%	language = MATLAB,
+	morekeywords = {byte},
+	literate = %
+		{ą}{{\k{a}}}1
+		{Ą}{{\k{A}}}1
+		{ć}{{\'c}}1
+		{Ć}{{\'{C}}}1
+		{ę}{{\k{e}}}1
+		{Ę}{{\k{E}}}1
+		{ł}{{\l{}}}1
+		{Ł}{{\L{}}}1
+		{ń}{{\'n}}1
+		{Ń}{{\'N}}1
+		{ó}{{\'o}}1
+		{Ó}{{\'O}}1
+		{ś}{{\'s}}1
+		{Ś}{{\'S}}1
+		{ż}{{\.z}}1
+		{Ż}{{\.Z}}1
+		{ź}{{\'z}}1
+		{Ź}{{\'Z}}1
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{IP -- lab. nr 10}
+\rhead{Bończyk, Kaźmieruk, Skibiński}
+\cfoot{\thepage}
+
+\graphicspath{
+	{./img/}
+}
+
+
+
+
+%%%
+%%%		DOKUMENT
+%%%
+
+\begin{document}
+
+
+
+%%%
+%%%		TITLEPAGE
+%%%
+
+\begin{titlepage}
+{\LARGE
+\begin{center}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width = 0.2\linewidth]{C:/good_folder/nauka/inne/polsl_logo_v2}
+	\end{figure}
+	
+	\vspace{0.25cm}
+	
+	\textbf{\textsc{Politechnika Śląska}}
+	
+	\textbf{\textsc{Wydział Automatyki, Elektroniki i Informatyki}}
+	
+	\vspace{1.5cm}
+	
+	Laboratorium Identyfikacji Procesów
+	
+	\vspace{1.5cm}
+	
+	Ćw. nr 10:
+	
+	Dynamiczne liniowe modele obiektów niestabilnych. Problem sprzężenia zwrotnego.
+	
+	\vspace{0.5cm}
+	
+	{\Large Sprawozdanie v.2}
+\end{center}
+}
+
+\vfill
+
+{\Large
+\noindent
+\textbf{Data laboratorium:} 10.12.2021 r.
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{AiR S2-I/Rob}\\
+\textbf{Sekcja 2, podsekcja 1}:
+
+\noindent
+\hspace*{0.5cm} Klaudia Bończyk\\
+\hspace*{0.5cm} Paweł Kaźmieruk\\
+\hspace*{0.5cm} Maksymilian Skibiński\\
+
+% rok 2020/2021, sem. letni, gr. Rob, sekcja nr 1
+
+\vspace{0.5cm}
+}
+
+\begin{center}
+\phantom{\today{} r.}
+\end{center}
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\newpage
+
+\section{Wstęp}
+
+Tematem ćwiczeń laboratoryjnych była identyfikacja modeli obiektów objętych sprzężeniem zwrotnym.
+Identyfikacja takich obietków jest utrudniona poprzez fakt, że sygnał wejściowy $u$ nie może być dowolnie kształtowany, a jest on powiązany z transmitancją sprzężenia zwrotnego. Z tego względu, by identyfikacja mogła zostać poprawnie przeprowadzona muszą być spełnione warunki identyfikowalności.
+
+\section{Ćwiczenie}
+
+\subsection*{Obiekt}
+
+Pierwszym punktem laboratorium był dobór parametrów identyfikowanego obiektu. Jako dzielni i ambitni studenci wybraliśmy wartości, dające w rezultacie obiekt niestabilny w torze otwartym. Obiekt ten to:
+\[
+H(z^{-1}) = z^{-1} \frac{0.2}{1 - 1.5 z^{-1}}
+\]
+
+Obiekt ma jeden biegun:
+\begin{align*}
+1 - 1.5 z^{-1} &= 0 \\
+1 &= 1.5 z^{-1} \\
+z &= 1.5
+\end{align*}
+
+Rozkład zer i biegunów na płaszczyźnie zespolonej jest widoczny na rysunku~\ref{fig:z}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5 \linewidth]{zplane}
+	\caption{Zera i bieguny obiektu}
+	\label{fig:z}
+\end{figure}
+
+Obiekt ma jeden biegun, który leży poza kołem jednostkowym ($|z_1| > 1$), zatem jest on niestabilny w torze otwartym.
+
+Jednakże obiekt zostanie zamknięty w pętli sprzężenia zwrotnego, zatem wybierając odpowiednie wzmocnienie regulatora będzie on ustabilizowany. Zakres takich wartości wzmocnień można wyznaczyć analitycznie.
+
+Jeśli przez $H_o$ oznaczymy transmitancję obiektu w torze otwartym, to przez $H_z$ oznaczmy transmitancję obiektu zamkniętego poprzez sprzężenie zwrotne:
+\[
+	H_o(z^{-1}) = \frac{L_o(z^{-1})}{M_o(z^{-1})} \qquad\qquad
+	H_z(z^{-1}) = \frac{H_o(z^{-1})}{1 + H_o(z^{-1})} =
+	\frac{\frac{L_o(z^{-1})}{M_o(z^{-1})}}{1 + \frac{L_o(z^{-1})}{M_o(z^{-1})}} =
+	\frac{L_o(z^{-1})}{M_o(z^{-1}) + L_o(z^{-1})}
+\]
+
+Analizując obiekt nad którym kontrolę sprawuje regulator proporcjonalny ze wzmocnieniem $k_r$ mianownik transmitancji $H_z(z^{-1})$ przyjmuje:
+\[
+	M_z(z^{-1}) = M_o(z^{-1}) + L_o(z^{-1}) = 0.2 \ k_r \ z^{-1} + 1 - 1.5 \ z^{-1}
+\]
+
+By znaleźć interesujący nas zakres wzmocnień musimy znaleźć zależność pomiędzy nim, a biegunami/biegunem:
+\begin{align*}
+0.2 \ k_r \ z^{-1} + 1 - 1.5 \ z^{-1} &= 0 \\
+0.2 \ k_r + z - 1.5 &= 0 \\
+-z &= -1.5 + 0.2 \ k_r \\
+z &= 1.5 - 0.2 \ k_r \\
+\end{align*}
+
+Obiekt ma jeden biegun i chcemy by leżał on w kole jednostkowym, zatem:
+\begin{align*}
+|1| &< 1.5 - 0.2 \ k_r
+\end{align*}
+
+Rozbijając nierówność na dwa przypadki, po przekształceniach otrzymamy:
+\[
+	2.5 < k_r < 12.5
+\]
+
+Do podobnych wniosków można dojść rysując linie pierwiastkowe np. przy pomocy polecenia \texttt{rlocus} (rys.~\ref{fig:rlocus}).
+
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[]{%
+		\includegraphics[width = 0.48 \linewidth]{rlocus1}%
+	}%
+	\hfill%
+	\subfloat[wzmocnienia bliskie granicznym]{%
+		\includegraphics[width = 0.48 \linewidth]{rlocus2}%
+	}%
+	\caption{Linie pierwiastkowe}
+	\label{fig:rlocus}
+\end{figure}
+
+Z tego zakresu wzmocnień będziemy korzystać budując układy regulacji w następnych zadaniach.
+
+\subsection{$\displaystyle \mathbf{w \neq 0, \quad R(z^{-1}) = k = const}$}
+
+Po zbudowaniu układu regulacji w Simulinku, identyfikację rozpoczynamy od przypadku, gdy wartość zadana jest niezerowa. Jako wzmocnienie regulatora przyjmijmy: $k_r = 6$.
+
+W modelu na wyjście obiektu dodane zostało pewne zakłócenie w postaci białego szumu o małej wariancji, by urzeczywistnić eksperyment identyfikacji. Ponadto, we wszystkich zadaniach używamy pewnych warunków początkowych dla wyjścia obiektu.
+
+Na rysunkach~\ref{fig:zd1} widnieją zarejestrowane przebiegi.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[sygnał wyjściowy $y$, wartość zadana $w$ (wykres górny) i sygnał sterujący $u$ (wykres dolny)]{%
+		\includegraphics[width = 0.48 \linewidth]{zd1_1}%
+	}%
+	\hfill%
+	\subfloat[użycie funkcji \texttt{compare}]{%
+		\includegraphics[width = 0.48 \linewidth]{zd1_2}%
+	}%
+	\caption{Zadanie nr 1 -- wykresy}
+	\label{fig:zd1}
+\end{figure}
+
+Do identyfikacji używamy tylko pewnej części z zarejestrowanych sygnałów -- gdy wygasły już warunki początkowe i wartość zadana zmieniła się skokowo. Fragment ten widać choćby na wykresie wynikowym funkcji \texttt{compare}%
+\footnote{Czas na osi poziomej nie pokrywa się z faktycznym czasem, z którego pochodzi fragment danych użytych do identyfikacji. Funkcja \texttt{compare} nie bierze tego pod uwagę.}%
+.
+
+Zidentyfikowany model:
+\[
+	H(z^{-1}) = \frac{0.2031 \ z^{-1}}{1 - 1.508 \ z^{-1}}
+\]
+
+właściwie pokrywa się z faktycznym modelem obiektu, a różnice są minimalne. Gdybyśmy, nie używali szumu na wyjściu obiektu, otrzymalibyśmy stu procentowe dopasowanie.
+
+\subsection{$\displaystyle \mathbf{w = 0, \quad R(z^{-1}) = k = const}$}
+
+Regulator pozostaje bez zmian, natomiast wartość zadana jest teraz zerowa i nie zmienia się w trakcie eksperymentu. Do identyfikacji używamy zatem tylko wygasających warunków początkowych.
+
+Na rysunkach~\ref{fig:zd2} widnieją zarejestrowane przebiegi.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[sygnał wyjściowy $y$, wartość zadana $w$ (wykres górny) i sygnał sterujący $u$ (wykres dolny)]{%
+		\includegraphics[width = 0.48 \linewidth]{zd2_1}%
+	}%
+	\hfill%
+	\subfloat[użycie funkcji \texttt{compare}]{%
+		\includegraphics[width = 0.48 \linewidth]{zd2_2}%
+	}%
+	\caption{Zadanie nr 2 -- wykresy}
+	\label{fig:zd2}
+\end{figure}
+
+Zidentyfikowany model:
+\[
+	H(z^{-1}) = \frac{-0.03893 \ z^{-1}}{1}
+\]
+
+Otrzymany model zupełnie nie pokrywa się z modelem obiektu. Wynika to z faktu, że niespełnione zostały warunki identyfikowalności. Rzędy wielomianów modelu obiektu i regulatora to:
+\[
+	d = 1, \quad dB = 0, \quad dA = 1 \qquad\qquad
+	dQ = 0, \quad dP = 0
+\]
+
+zatem, odnosząc te wartość do pierwszego warunku identyfikowalności:
+\begin{align*}
+	dQ > dA - d:& \quad 0 > 0 \\
+	dP > dB:& \quad 0 > 0
+\end{align*}
+
+Widać zatem, że żadna z obu nierówności nie jest spełniona.\\
+
+Mimo wszystko sytuacji tej można zaradzić, ale to będzie tematem kolejnych zadań. Należy jednak wziąć pod uwagę, że niespełnienie warunku identyfikowalnośći wcale nie oznacza, że przeprowadzenie identyfikacji nie jest zupełnie możliwe. Cały czas możemy ją przeprowadzić, tak jak zresztą zostało zrobione w tym zadaniu, ale jej wynik jest dla nas zupełnie nieprzydatny. Uzyskany model jest mimo wszystko w jakimś stopniu dopasowany do danych pomiarowych (co zresztą widać na rysunkach~\ref{fig:zd2} oraz na wartości współczynnika dopasowania), ale nie jest dopasowany do \emph{modelu obiektu}, a na tym nam właśnie zależy.
+
+\subsection{$\displaystyle \mathbf{w = 0, \quad R(z^{-1}) = \frac{Q(z^{-1})}{R(z^{-1})}}$}
+
+Zmieńmy strukturę regulatora tak, by pierwszy warunek identyfikowalności był spełniony. Jednakże, musimy wziąć pod uwagę, że teraz zmianie ulegnie także transmitancja opisująca cały układ regulacji zamknięty poprzez sprzeżenie zwrotne, zatem inny będzie teraz rozkład zer i biegunów.
+
+Jeśli regulator będzie opisany transmitancją:
+\[
+	 R(z^{-1}) = \frac{Q(z^{-1})}{P(z^{-1})} = \frac{6 - 2 \ z^{-1}}{1} = 6 - 2 \ z^{-1}
+\]
+
+Rozkład zer i biegunów układu zamkniętego będzie wyglądał jak na rysunku~\ref{fig:zd3_z}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.45 \linewidth]{zd3_z}
+	\caption{Zera i bieguny obiektu z zadania nr 3}
+	\label{fig:zd3_z}
+\end{figure}
+
+Wszytkie bieguny leżą wewnątrz okręgu jednostkowego, zatem układ jest stabilny.
+
+Na rysunkach~\ref{fig:zd3} widnieją zarejestrowane przebiegi.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[sygnał wyjściowy $y$, wartość zadana $w$ (wykres górny) i sygnał sterujący $u$ (wykres dolny)]{%
+		\includegraphics[width = 0.48 \linewidth]{zd3_1}%
+	}%
+	\hfill%
+	\subfloat[użycie funkcji \texttt{compare}]{%
+		\includegraphics[width = 0.48 \linewidth]{zd3_2}%
+	}%
+	\caption{Zadanie nr 3 -- wykresy}
+	\label{fig:zd3}
+\end{figure}
+
+Zidentyfikowany model:
+\[
+	H(z^{-1}) = \frac{0.1980 \ z^{-1}}{1 - 1.429 \ z^{-1}}
+\]
+
+Tym razem wynik identyfikacji jest bliski faktycznemu modelowi obiektu. Zmiana dynamiki regulatora spowodowała, że spełniony został pierwszy warunek identyfikowalności. Spójrzmy na nie raz jeszcze, biorąc pod uwagę, że teraz: $dQ = 1, dP = 0$:
+\begin{align*}
+	dQ > dA - d:& \quad 1 > 0 \\
+	dP > dB:& \quad 0 > 0
+\end{align*}
+
+Pierwsza nierówność jest teraz spełniona, co nam wystarcza do przeprowadzenia identyfikacji.
+
+\subsection{$\displaystyle \mathbf{w = 0, \quad R(z^{-1}) = k(i)}$}
+
+Nie zawsze jednak możemy zmienić dynamikę regulatora, bo może się to wiązać z dodatkowymi kosztami. Wtedy, możemy mimo wszystko wykorzystać samo wzmocnienie, ale musi się ono zmieniać w czasie trwania eksperymentu. Oczywiście, trzeba mieć na uwadzę, by wciąż znajdowało się ono w odpowiednim zakresie, zapewniającym stabilność.
+
+Na rysunkach~\ref{fig:zd4},~\ref{fig:zd4_2} widnieją zarejestrowane przebiegi wraz z przebiegiem wzmocnienia.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[sygnał wyjściowy $y$, wartość zadana $w$ (wykres górny) i sygnał sterujący $u$ (wykres dolny)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd4_1}%
+	}%
+	\hfill%
+	\subfloat[użycie funkcji \texttt{compare}]{%
+		\includegraphics[width = 0.45 \linewidth]{zd4_3}%
+	}%
+	\caption{Zadanie nr 4 -- wykresy}
+	\label{fig:zd4}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.45 \linewidth]{zd4_2}%
+	\caption{Zadanie nr 4 -- wykres zmian wzmocnienia}
+	\label{fig:zd4_2}
+\end{figure}
+
+Zidentyfikowany model:
+\[
+	H(z^{-1}) = \frac{0.2031 \ z^{-1}}{1 - 1.475 \ z^{-1}}
+\]
+
+Znów, udało się. Wystarczyło raz zmienić wzmocnienie w trakcie eksperymentu, by identyfikacja się powiodła -- zidentyfikowany model jest bardzo bliski faktycznemu modelowi obiektu.
+
+\subsection{$\displaystyle \mathbf{w = 0, \quad R(z^{-1}) = k(y(i))}$}
+
+Wzmocnienie można także uzależnić od sygnału wyjściowego. W automatyce tego typu rozwiązania czasem stosuje się przy sterowaniu obiektami nieliniowymi i nosi ono nazwę harmonogramowania wzmocnienia (ang. \emph{gain scheduling}). Przykładowo, niech wzmocnienie zależy od wyjścia zgodnie z odpowiednio ukształtowaną funkcją sigmoidalną:
+\[
+	k(y) = 6 \cdot \frac{1}{1 - e^{-x}} + 5
+\]
+
+Jej wykres został zamieszczony na rysunku~\ref{fig:sig}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.48 \linewidth]{zd5_k}%
+	\caption{Zadanie nr 5 -- zależność wzmocnienia od wyjścia}
+	\label{fig:sig}
+\end{figure}
+
+Znów, należy pamiętać o tym by wzmocnienie zawsze przyjmowało takie wartości, by układ był stabilny.
+
+Na rysunkach~\ref{fig:zd5},~\ref{fig:zd5_2} widnieją zarejestrowane przebiegi wraz z przebiegiem wzmocnienia.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[sygnał wyjściowy $y$, wartość zadana $w$ (wykres górny) i sygnał sterujący $u$ (wykres dolny)]{%
+		\includegraphics[width = 0.48 \linewidth]{zd5_1}%
+	}%
+	\hfill%
+	\subfloat[użycie funkcji \texttt{compare}]{%
+		\includegraphics[width = 0.48 \linewidth]{zd5_3}%
+	}%
+	\caption{Zadanie nr 5 -- wykresy}
+	\label{fig:zd5}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.48 \linewidth]{zd5_2}%
+	\caption{Zadanie nr 5 -- wzmocnienie w trakcie trwania eksperymentu}
+	\label{fig:zd5_2}
+\end{figure}
+
+Zidentyfikowany model:
+\[
+	H(z^{-1}) = \frac{0.1972 \ z^{-1}}{1 - 1.42 \ z^{-1}}
+\]
+
+Uzależnienie wzmocnienia od wyjścia pozwoliło otrzymać satysfakcjonujący wynik identyfikacji. Właściwie nieszczególnie nas to dziwi, biorać pod uwagę, że w poprzednim zadaniu skokowa zmiana wzmocnienia wystarczyła.
+
+\clearpage
+\newpage
+
+\section{Metoda pośrednia}
+
+W punkcie poprzednim identyfikację prowadziliśmy korzystając z metody bezpośredniej. W metodzie tej model obiektu identyfikowany jest korzystając z sygnałów $u(i)$ (sygnał sterujący) i $y(i)$ (sygnał wyjściowy). Sygnał sterujący nie zawsze może być dla nas dostępny, dlatego zainteresować można się metodą pośrednią.
+
+Metoda pośrednia polega na identyfikacji transmitancji opisującej cały zamknięty układ regulacji, czyli transmitancję regulatora jak i obiektu zamknięte w sprzężeniu zwrotnym. W tej metodzie identyfikacja dokonywana jest na podstawie sygnałów: $w(i)$ (wartość zadana) i, tak jak poprzednio, $y(i)$ (sygnał wyjściowy). Znając transmitancję regulatora, oraz stopnie wielomianów występujących w modelu obiektu, można wyprowadzić odpowiednie zależności pomiędzy tymi wartościami.
+
+W układzie regulacji występują:
+\begin{itemize}
+\item regulator: $\displaystyle R(z^{-1}) = \frac{Q(z^{-1})}{P(z^{-1})}$,
+\item obiekt: $\displaystyle H(z^{-1}) = \frac{B(z^{-1})}{A(z^{-1})} \cdot z^{-d}$.
+\end{itemize}
+
+Transmitancja układu otwartego to:
+\[
+	K_o(z^{-1}) = \frac{Q(z^{-1})}{P(z^{-1})} \cdot \frac{B(z^{-1})}{A(z^{-1})} \cdot z^{-d} =
+		\frac{Q(z^{-1}) B(z^{-1}) z^{-d}}{P(z^{-1}) A(z^{-1})} =
+		\frac{L_o(z^{-1})}{M_o(z^{-1})}
+\]
+
+Transmitancja układu zamkniętego to:
+\[
+	K_z(z^{-1}) = \frac{K_o(z^{-1})}{1 + K_o(z^{-1})} =
+		\frac{L_o(z^{-1})}{L_o(z^{-1}) + M_o(z^{-1})}
+\]
+
+Transmitancja identyfikowanego obiektu to:
+\[
+	H(z^{-1}) = z^{-1} \frac{b_0}{1 - a_1 z^{-1}}
+\]
+
+Zatem, ostatecznie transmitancja układu zamkniętego to:
+\[
+	K_z(z^{-1}) = \frac{b_0 z^{-1} Q(z^{-1})}{b_0 z^{-1} Q(z^{-1}) + (1 + a_1 z^{-1}) P(z^{-1})}
+\]
+
+Wielomiany $Q(z^{-1})$ i $P(z^{-1})$ występujące w transmitancji regulatora są przez nas dobierane na potrzeby identyfikacji i ogólnie znane.\\
+
+Przyjmijmy, że regulator jest taki sam jak w pierwszym punkcie rozdziału dotyczącego identyfikacji metodą bezpośrednią, czyli:
+\[
+	R(z^{-1}) = \frac{k_r}{1} = k_r, \qquad \text{gdzie:} \ k_r = 6
+\]
+
+Oczywiście, na wzmocnienie nałożone są takie same ograniczenia ze względu na stabilność układu jak poprzednio. Niech wartość zadana zmieni się tak samo jak poprzednio przy identyfikacji metodą bezpośrednią i przyjmie wartość 10. Na rysunku~\ref{fig:posr} widnieją przebiegi odpowiednich sygnałów występujących w układzie i porównanie pomiarów z uzyskanym modelem.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[sygnał wyjściowy $y$, wartość zadana $w$ (wykres górny) i sygnał sterujący $u$ (wykres dolny)]{%
+		\includegraphics[width = 0.48 \linewidth]{posr1}%
+	}%
+	\hfill%
+	\subfloat[użycie funkcji \texttt{compare}]{%
+		\includegraphics[width = 0.48 \linewidth]{posr2}%
+	}%
+	\caption{Identyfikacja metodą pośrednią -- wykresy}
+	\label{fig:posr}
+\end{figure}
+
+Uzyskany model to:
+\[
+	K_z(z^{-1}) = \frac{1.219 \ z^{-1}}{1 - 0.2894 \ z^{-1}}
+\]
+
+Oczywiście jest to na razie model układu zamkniętego. Wyprowadźmy parametry modelu obiektu:
+\begin{gather*}
+1.219 = b_0 \cdot k_r \implies b_0 = \frac{1.219}{6} = 0.2032
+\end{gather*}
+
+\begin{align*}
+1 - 0.2894 \ z^{-1} = b_0 k_r z^{-1} + 1 + a_1& z^{-1} \\
+a_1& = - 0.2894 - 1.219 \\
+a_1& = -1.5084
+\end{align*}
+
+Zatem model obiektu to:
+\[
+	H(z^{-1}) = \frac{0.2032 \ z^{-1}}{1 - 1.5084 \ z^{-1}}
+\]
+
+Identyfikacja się powiodła -- uzyskany model jest bliski faktycznemu.\\
+
+W porównaniu do identyfikacji metodą bezpośrednią, identyfikacja nie przniesie satysfakcjonujących wyników, gdy wartość zadana będzie: $w(i) = 0$. Gdy tak jest, wielomian występujący w liczniku transmitancji układu zamkniętego nie może zostać poprawnie określony.
+
+\clearpage
+\newpage
+\section{Podsumowanie}
+
+Identyfikacja obiektów objętych sprzężeniem zwrotnym jest utrudniona. Sygnał wejściowy identyfikowanego obiektu nie może być dowolnie kształtowany, a wynika on ze sprzężenia zwrotnego i regulatora. Ponadto, muszą zostać spełnione dodatkowe warunki identyfikowalności, by dokonać nieobciążonej estymacji parametrów modelu.
+
+Podczas laboratorium mogliśmy się przekonać o tym, że mimo wszystko nie jest to zadanie niewykonalne, a po prostu być może trzeba do niego trochę inaczej podejść. Nawet jeśli pierwsze warunek identyfikowalności nie jest spełniony to możemy sobie wciąż poradzić z identyfikacją uniestacjonarniając wzmocnienie regulatora.
+
+Gdy zaś sygnał sterujący $u(i)$ jest niedostępny można skorzystać z identyfikacji metodą pośrednią.
+
+\end{document}

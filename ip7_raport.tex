@@ -1,0 +1,858 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage{polski}
+\usepackage{geometry}
+	\geometry{margin = 2.5cm}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{bold-extra}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{graphicx}
+\usepackage[unicode, colorlinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage[shortlabels]{enumitem}
+	\setlist[itemize]{--, itemsep = 0cm}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{subfig}
+\usepackage[labelfont = bf]{caption}
+
+\linespread{1.3}
+
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+
+\lstdefinestyle{mystyle}{%
+	backgroundcolor = \color{backcolour},
+ 	basicstyle = \ttfamily \small,
+	commentstyle = \color{red!90!black},
+	numberstyle = \tiny \color{codegray},
+	stringstyle = \color{codepurple},
+	keywordstyle = \color{blue!85!black},
+	breakatwhitespace = false,
+	breaklines = true,
+	captionpos = b,
+	keepspaces = true,
+	showspaces = false,
+	showstringspaces = false,
+	showtabs = false,
+	tabsize = 4,
+	numbers = left,
+	numberstyle = \tiny \color{black},
+	morecomment = [l]{\%},
+	frame = single
+}
+
+\lstset{
+	style = mystyle,
+%	language = MATLAB,
+	morekeywords = {byte},
+	literate = %
+		{ą}{{\k{a}}}1
+		{Ą}{{\k{A}}}1
+		{ć}{{\'c}}1
+		{Ć}{{\'{C}}}1
+		{ę}{{\k{e}}}1
+		{Ę}{{\k{E}}}1
+		{ł}{{\l{}}}1
+		{Ł}{{\L{}}}1
+		{ń}{{\'n}}1
+		{Ń}{{\'N}}1
+		{ó}{{\'o}}1
+		{Ó}{{\'O}}1
+		{ś}{{\'s}}1
+		{Ś}{{\'S}}1
+		{ż}{{\.z}}1
+		{Ż}{{\.Z}}1
+		{ź}{{\'z}}1
+		{Ź}{{\'Z}}1
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{IP -- lab. nr 7}
+\rhead{Bończyk, Kaźmieruk, Skibiński}
+\cfoot{\thepage}
+
+\graphicspath{
+	{./img/}
+	{./img/1_ar} {./img/1_ma} {./img/2_ar} {./img/2_ma}
+	{./img/3} {./img/4} {./img/5} {./img/6}
+}
+
+
+
+
+%%%
+%%%		DOKUMENT
+%%%
+
+\begin{document}
+
+
+
+%%%
+%%%		TITLEPAGE
+%%%
+
+\begin{titlepage}
+{\LARGE
+\begin{center}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width = 0.2\linewidth]{C:/good_folder/nauka/inne/polsl_logo_v2}
+	\end{figure}
+	
+	\vspace{0.25cm}
+	
+	\textbf{\textsc{Politechnika Śląska}}
+	
+	\textbf{\textsc{Wydział Automatyki, Elektroniki i Informatyki}}
+	
+	\vspace{1.5cm}
+	
+	Laboratorium Identyfikacji Procesów
+	
+	\vspace{1.5cm}
+	
+	Ćw. nr 7:
+	
+	Modele sygnałów stochastycznych.
+	
+	\vspace{0.5cm}
+	
+	{\Large Sprawozdanie}
+\end{center}
+}
+
+\vfill
+
+{\Large
+\noindent
+\textbf{Data laboratorium:} 21.01.2022 r.
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{AiR S2-I/Rob}\\
+% \textbf{Sekcja nr 1}:
+\textbf{Sekcja 2, podsekcja 1:}
+
+\noindent
+\hspace*{0.5cm} Klaudia Bończyk\\
+\hspace*{0.5cm} Paweł Kaźmieruk\\
+\hspace*{0.5cm} Maksymilian Skibiński\\
+
+% rok 2020/2021, sem. letni, gr. Rob, sekcja nr 1
+
+\vspace{0.5cm}
+}
+
+\begin{center}
+\phantom{\today{} r.}
+\end{center}
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\newpage
+
+\section*{Wstęp}
+Celem ćwiczeń była identyfikacja modeli ciągów czasowych. Szczególna uwaga została zwrócona na wpływ wartości i liczby parametrów modeli AR, MA i ARMA na przebiegi czasowe, funkcję autokowariancji oraz korelację cząstkową. Zbadany został także wpływ różnicowania na ciąg czasowy.
+
+Na końcu sprawozdania zamieszczony został kod, a przynajmniej jego fragmenty w jakiś sposób udowadniające,
+że wykonaliśmy ćwiczenie.
+
+\section*{Zadanie 1}
+Wygenerowana została odpowiedź dla ciągu AR(1):
+\[
+	y(i) = \frac{1}{1 + a_1 \ z^{-1}} \ e(i)
+\]
+dla różnych wartości parametru $a_1$. Otrzymane przebiegi czasowe zostały zamieszczone na 
+rys.~\ref{fig:zd1_ar}.
+
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[$a_1 = -0.8$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ar_a_-0.8}%
+	}%
+	\hfill%
+	\subfloat[$a_1 = -0.1$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ar_a_-0.1}%
+	}%
+	
+	\subfloat[$a_1 = 0.1$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ar_a_0.1}%
+	}%
+	\hfill%
+	\subfloat[$a_1 = 0.8$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ar_a_0.8}%
+	}%
+	
+	\subfloat[$a_1 = 0.995$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ar_a_0.995}%
+	}%
+	\hfill%
+	\subfloat[$a_1 = 2$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ar_a_2}%
+	}%
+	
+	\caption{Przebiegi czasowe w zależności od wartości $a_1$}
+	\label{fig:zd1_ar}
+\end{figure}
+
+\subsection*{Obserwacje}
+\begin{itemize}
+\item Wraz ze wzrostem wartości bezwzględnej parametru $a_1$ wzrasta ogółem amplituda sygnału wyjściowego -- zarejstrowane wartości ekstremalne będą coraz większe.
+\item Wraz ze wzrostem wartości bezwzględnej parametru $a_1$ wzrasta także wariancja sygnału.
+\item Gdy $|a_1| > 1$ model jest niestabilny -- odpowiedź układu nieprzerwanie rośnie.
+\end{itemize}
+
+Ciekawiej jest z wpływem znaku parametru $a_1$ na otrzymywaną odpowiedź.
+Porównując tak ,,na oko'' przebiegi otrzymywane dla wartości parametru $a_1$ rózniących się tylko znakiem, można zauważyć, że sygnał dla wartości $a_1$ ze znakiem dodatnim podlega dużo większym chwilowym zmianom. By zbadać zjawisko pod lupą możemy przekształcić równanie opisujące wyjście $y(i)$ tak, by zawierało same wartości pobudzenia $e(i)$. Kilka pierwszych takich przekształceń zostało zamieszczonych w tabeli poniżej.
+\begin{table}[htbp!]
+	\centering
+	\begin{tabular}{c||l|l}
+		$i$ & $y(i)$, [$a_1 = 0.9$] & $y(i)$, [$a_1 = -0.9$] \\
+		\hline
+		0 &
+			$e_0$ &
+			$e_0$ \\
+		1 &
+			$e_1 - 0.9 e_0$ &
+			$e_1 + 0.9 e_0$ \\
+		2 &
+			$e_2 - 0.9 e_1 + 0.81 e_2$ &
+			$e_2 + 0.9 e_1 + 0.81 e_2$ \\
+		3 &
+			$e_3 - 0.9 e_2 + 0.81 e_1 - 0.729 e_0$ &
+			$e_3 + 0.9 e_2 + 0.81 e_1 + 0.729 e_0$ \\
+		4 &
+			$e_4 - 0.9 e_3 + 0.81 e_2 - 0.729 e_1 + 0.6561 e_0$ &
+			$e_4 + 0.9 e_3 + 0.81 e_2 + 0.729 e_1 + 0.6561 e_0$ \\
+		$\vdots$ &
+			$\vdots$ & $\vdots$
+	\end{tabular}
+	\caption{Zależność $y(i)$ od $e(i)$ w chwilach przeszłych}
+	\label{tbl:y_e}
+\end{table}
+
+W zależności od znaku $a_1$ równania różnią się tylko znakami przy kolejnych $e_i$: dla ujemnego $a_1$ wszystkie znaki to plusy, natomiast dla $a_1$ dodatniego znaki zmieniają się na przemian i co więcej dla kolejnych $y_i$ te same wartości $e_i$ z przeszłości są brane ze znakami na przemian.
+
+Jeśli takie modele pobudzimy skokami jednostkowymi zobaczymy, że model dla ujemnego $a_1$ zwróci
+odpowiedź aperiodyczną, a model dla dodatniego $a_1$ odpowiedź oscylacyjną.
+
+Na rysunku poniżej widnieje porównanie przebiegów otrzymanych dla $a_1 = \pm 0.9$ oraz wykres przedstawiający róznice pomiędzy kolejnymi wartościami $y_i$ w wartościach bezwględnych, czyli:
+$\Delta y(i) = |y(i) - y(i-1)|$.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[przebiegi czasowe]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_a_0.9_y}%
+	}%
+	\hfill%
+	\subfloat[różnice pomiędzy kolejnymi $y_i$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_a_0.9_dy}%
+	}%
+	
+	\caption{Porównanie przebiegów czasowych dla $a_1 = \pm 0.9$}
+	\label{fig:zd1_a_09}
+\end{figure}
+
+\section*{Zadanie 2}
+Zgodnie z poleceniem przyjmijmy, że $a_1 = 0.8$ i wyznaczmy wariancję otrzymanego sygnału oraz pierwszych kilka wartości funkcji autokorelacji. Przekształcenia prowadzące do otrzymania kolejnych wyrazów funkcji autokowariancji znajdują się w skrypcie. Dla modelu AR(1) otrzymujemy:
+\[
+	\gamma_i =
+	\begin{cases}
+		\frac{\lambda^2}{1 - a_1^2} & \text{dla} \ i = 1 \\
+		-a_1 \ \gamma_{i-1} & \text{dla} \ i > 1
+	\end{cases}
+\]
+
+Wzór pozwalający obliczyć wariancję to:
+\[
+	\text{var}[X] = \text{E}[(X - \mu)^2]
+\]
+
+Zgodnie z przekształceniami w skrypcie: $\mu = 0$, a zatem wzór uprości się do postaci takiej samej
+co przy obliczaniu wartości funkcji autokowariancji dla $k=0$. Wariancja zatem wynosi:
+\[
+	\text{var}[y(i)] = \frac{\lambda^2}{1 - a_1^2}
+\]
+
+Na rys.~\ref{fig:zd2_ar} zostało zamieszczone porównanie wartości wyznaczonych analitycznie z
+wartościami obliczonymi przy pomocy polecenia \texttt{xcorr} na podstawie wygenerowanego
+sygnału.
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[$N = 1000$: $k$ od 0 do 10]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ar_gamma_n_1000_img1}%
+	}%
+	\hfill%
+	\subfloat[$N = 1000$: $k$ od 0 do 100]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ar_gamma_n_1000_img2}%
+	}%
+	
+	\subfloat[$N = 10000$: $k$ od 0 do 10]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ar_gamma_n_10000_img1}%
+	}%
+	\hfill%
+	\subfloat[$N = 10000$: $k$ od 0 do 100]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ar_gamma_n_10000_img2}%
+	}%
+	
+	\subfloat[$N = 100000$: $k$ od 0 do 10]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ar_gamma_n_100000_img1}%
+	}%
+	\hfill%
+	\subfloat[$N = 100000$: $k$ od 0 do 100]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ar_gamma_n_100000_img2}%
+	}%
+	
+	\caption{Funkcja autokowariancji w zależności od liczby próbek $N$}
+	\label{fig:zd2_ar}
+\end{figure}
+
+W tabeli~\ref{tbl:zd2_ar} porównane zostały wartości wariancji obliczonej analitycznie z wyznaczoną
+poleceniem \texttt{var} na podstawie wygenerowanych danych.
+\begin{table}[htbp!]
+	\centering
+	\begin{tabular}{c||c|c}
+		$N$ & $\text{var}_{xcorr}$ & $\text{var}_{analitycznie}$ \\
+		\hline
+		1000 & 3.3279 & 2.7778 \\
+		10000 & 2.8311 & 2.7778 \\
+		100000 & 2.7754 & 2.7778 \\
+	\end{tabular}
+	\caption{Wariancja w zależności od liczby próbek $N$}
+	\label{tbl:zd2_ar}
+\end{table}
+
+Wniosek jest właściwie jeden: czym więcej próbek tym lepiej obliczenia wykonane na danych pomiarowych będą pokrywały się z wartościami wyznaczonymi w sposób analityczny.
+
+\section*{Zadanie 3}
+Poprzednie dwa zadania zostały wykonane dla modelu MA(1):
+\[
+	y(i) = (1 + c_1 \ z^{-1}) \ e(i)
+\]
+
+Na rys.~\ref{fig:zd3_ma} przedstawiony został wpływ wartości $c_1$ na przebiegi czasowe $y(i)$.
+
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[$c_1 = -0.8$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ma_c_-0.8}%
+	}%
+	\hfill%
+	\subfloat[$c_1 = -0.1$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ma_c_-0.1}%
+	}%
+	
+	\subfloat[$c_1 = 0.1$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ma_c_0.1}%
+	}%
+	\hfill%
+	\subfloat[$c_1 = 0.8$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ma_c_0.8}%
+	}%
+	
+	\subfloat[$c_1 = 0.995$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ma_c_0.995}%
+	}%
+	\hfill%
+	\subfloat[$c_1 = 2$]{%
+		\includegraphics[width = 0.45 \linewidth]{zd1_ma_c_2}%
+	}%
+	
+	\caption{Przebiegi czasowe w zależności od wartości $c_1$}
+	\label{fig:zd3_ma}
+\end{figure}
+
+\subsection*{Obserwacje}
+Wraz ze wzrostem modułu wartości $c_1$ wzrasta wariancja oraz wartości ekstremalne zarejstrowane w danych.
+\\
+
+\subsection*{Funkcja autokowariancji}
+Wyprowadźmy wartości funkcji autokowariancji dla modelu MA(1). Model ciągu w postaci równania
+różnicowego to:
+\[
+	y(i) = e(i) + c_1 e(i-1)
+\]
+
+Wartość średnia $\bar{y}$:
+\begin{align*}
+	\bar{y} = \text{E}[y(i)] &= \text{E}[e(i)] + c_1 \text{E}[e(i-1)] \\
+	\text{E}[y(i)] &= 0 + c_1 \cdot 0 = 0
+\end{align*}
+
+Zatem, tak jak w przypadku modelu AR(1), wzór na funkcję autokowariancji się skraca do postaci:
+\[
+	\Gamma(y,k) = \text{E}[y(i)y(i-k)]
+\]
+
+\paragraph{k = 0:}
+\begin{align*}
+	\gamma_0 &=
+		\text{E}[y^2(i)] = \text{E}[e^2(i)] + 2 c_1 \text{E}[e(i)e(i-1)] + c_1^2 \text{E}[e^2(i-1)] \\
+	\gamma_0 &=
+		\lambda^2 + 0 + c_1^2 \lambda^2 = (1 + c_1^2) \lambda^2
+\end{align*}
+
+\paragraph{k = 1:}
+\begin{align*}
+	\gamma_1 &=
+		\text{E}[y(i)y(i-1)] = \text{E}[e(i)y(i-1)] + c_1 \text{E}[e(i-1)y(i-1)] \\
+	\gamma_1 &=
+		0 + c_1 \left(
+			\text{E}[e^2(i-1)] + c_1 \text{E}[e(i-1)e(i-2)] 
+			\right) \\
+	\gamma_1 &=
+		0 + c_1 \left(
+			\lambda^2 + 0
+			\right) = c_1 \lambda^2
+\end{align*}
+
+
+\paragraph{k = 2:}
+\begin{align*}
+	\gamma_2 &=
+		\text{E}[y(i)y(i-2)] = \text{E}[e(i)y(i-2)] + c_1 \text{E}[e(i-1)y(i-2)] \\
+	\gamma_2 &=
+		0 + 0 = 0 \\
+\end{align*}
+
+\paragraph{k = 3:}
+\begin{align*}
+	\gamma_3 &=
+		\text{E}[y(i)y(i-3)] = \text{E}[e(i)y(i-3)] + c_1 \text{E}[e(i-1)y(i-3)] \\
+	\gamma_3 &=
+		0 + 0 = 0
+\end{align*}
+
+\paragraph{Zatem:}
+\[
+	\gamma_i = \begin{cases}
+		(1 + c_1^2) \lambda^2 &
+			\text{dla} \ i = 0 \\
+		c_1 \lambda^2 &
+			\text{dla} \ i = 1 \\
+		0 &
+			\text{dla} \ i \ge 2 \\
+	\end{cases}
+\]
+
+Przyjmijmy, że $c_1 = 0.8$.
+Porównanie wartości wyznaczonych analitycznie z wartościami otrzymanymi przy pomocy polecenia \texttt{xcorr} dla wygenerowanych danych zostały zamieszczone na rys.~\ref{fig:zd3_ma_2}. W tabeli~\ref{tbl:zd3_ma} porównane zostały wariancje: wyznaczona analitycznie i wyznaczona na podstawie danych przy użyciu \texttt{var}.
+\begin{table}[htbp!]
+	\centering
+	\begin{tabular}{c||c|c}
+		$N$ & $\text{var}_{xcorr}$ & $\text{var}_{analitycznie}$ \\
+		\hline
+		1000 & 1.6838 & 1.6400 \\
+		10000 & 1.6541 & 1.6400 \\
+		100000 & 1.6434 & 1.6400 \\
+	\end{tabular}
+	\caption{Wariancja w zależności od liczby próbek $N$}
+	\label{tbl:zd3_ma}
+\end{table}
+
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[$N = 1000$: $k$ od 0 do 10]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ma_gamma_n_1000_img1}%
+	}%
+	\hfill%
+	\subfloat[$N = 1000$: $k$ od 0 do 100]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ma_gamma_n_1000_img2}%
+	}%
+	
+	\subfloat[$N = 10000$: $k$ od 0 do 10]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ma_gamma_n_10000_img1}%
+	}%
+	\hfill%
+	\subfloat[$N = 10000$: $k$ od 0 do 100]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ma_gamma_n_10000_img2}%
+	}%
+	
+	\subfloat[$N = 100000$: $k$ od 0 do 10]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ma_gamma_n_100000_img1}%
+	}%
+	\hfill%
+	\subfloat[$N = 100000$: $k$ od 0 do 100]{%
+		\includegraphics[width = 0.45 \linewidth]{zd2_ma_gamma_n_100000_img2}%
+	}%
+	
+	\caption{Funkcja autokowariancji w zależności od liczby próbek $N$}
+	\label{fig:zd3_ma_2}
+\end{figure}
+
+\subsection*{Obserwacje}
+Wniosek jest taki sam jak poprzednio: czym więcej próbek $N$ danych pomiarowych tym mniejsza różnica
+pomiędzy wartościami wyznaczonymi na podstawie danych z tymi uzyskanymi analitycznie.
+
+\subsection*{Różnica pomiędzy modelami AR, a MA}
+Jak łatwo można zauważyć, modele AR i MA różnią się funkcjami autokorelacji. Dla modelu MA, dla przesunięcia: $k \ge nC$, gdzie przez $nC$ rozumiemy stopień modelu MA($nC$), autokorelacja przyjmuje wartości zerowe -- całkowicie zerowe.
+W przypadku modelu AR wartości dążą do zera, ale nie ma wyraźnego skoku do wartości zerowej.
+
+\section*{Zadanie 4}
+Dany jest ciąg $y(i)$:
+\[
+	y(i) = \frac{1}{1 - 2.5 z^{-1} + 2 z^{-2} -0.5 z^{-3}} \ e(i)
+\]
+
+Po pobudzeniu modelu otrzymujemy przebieg widoczny na rys.~\ref{fig:zd4_1}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.45 \linewidth]{zd4_y}
+	\caption{Przebieg czasowy}
+	\label{fig:zd4_1}
+\end{figure}
+
+Przebieg ten różni się znacznie od poprzednio obserwowanych. Jego wartość średnia ulega zmianom.
+Poza tym, poprzednio łatwo zauważalne było, że model pobudzany był losowymi wartościami (białym szumem), widać było jakim mocnym zmianom ulegało wyjście $y(i)$ z próbki na próbkę, a teraz tej losowości tak łatwo nie widać.
+
+Wielomian $A(z^{-1})$ zapisany w postaci iloczynowej to:
+\[
+	A(z^{-1}) = -0.5 (x - 2) (x - 1)^2
+\]
+
+Pierwiastki równania $A(z^{-1}) = 0$ to:
+\[
+	p_1 = 2, \quad p_2 = p_3 = 1,
+\]
+więc model jest niestabilny, gdyż pierwiastki $p_2$, $p_3$ leżą na okręgu jednostkowym.%
+\footnote{Dla modelu stabilnego pierwiastki równania $A(z^{-1}) = 0$ leżą na zewnątrz okręgu jednostkowego, 
+ale pierwiastki równania $A(z) = 0$ leżą wewnątrz tego okręgu. Jest to tylko kwestia pewnych przekształceń.}
+Niestabilność można łatwo zauważyć, jeśli model pobudzimy skokiem jednostkowym, co zamieszczamy na
+rys.~\ref{fig:zd4_unstable}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.45 \linewidth]{zd4_step}
+	\caption{Pobudzenie skokiem jednostkowym}
+	\label{fig:zd4_unstable}
+\end{figure}
+
+Na rys.~\ref{fig:zd4_d} widać przebiegi czasowe (otrzymane w wyniku pobudzenia białym szumem) po różnicowaniu ciągu.
+\begin{figure}[htbp!]
+	\centering
+	
+	\subfloat[różnicowanie pierwsze]{%
+		\includegraphics[width = 0.45 \linewidth]{zd4_y_1d}%
+	}%
+	\hfill%
+	\subfloat[różnicowanie drugie]{%
+		\includegraphics[width = 0.45 \linewidth]{zd4_y_2d}%
+	}%	
+
+	\caption{Różnicowanie ciągu}
+	\label{fig:zd4_d}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.45 \linewidth]{zd4_y_v2}
+	\caption{Użycie modelu analogicznego}
+	\label{fig:zd4_inny}
+\end{figure}
+
+Różnicowanie ciągu pozwoliło usunąć zmiany wartości średniej. Po drugim zróżnicowaniu przebieg czasowy
+już przypomina te, które widzieliśmy w poprzednich zadaniach.
+
+To co uzyskaliśmy w wyniku różnicowania ciągu można także uzyskać korzystając z modelu ARMA lub uproszczonego modelu AR, gdyż różnicowanie usunęło te bieguny, które czynił układ niestabilnym.
+
+Jeśli użyjemy modelu:
+\[
+	y(i) = \frac{(1 - z^{-1})^2}{-0.5 (z^{-1} - 2) (z^{-1} - 1)^2} \ e(i) = \frac{1}{1 -0.5 z^{-1}} \ e(i)
+\]
+to w rezultacie po pobudzeniu tego modelu tym samym pobudzeniem otrzymamy te same przebiegi co widać na
+rys.~\ref{fig:zd4_inny}.
+
+\section*{Zadanie 5}
+Dla ciągów danych wygenerowanych dla kilku różnych modeli na jednym wykresie przedstawione zostały:
+unormowana funkcja autokowariancji oraz funkcja korelacji cząstkowej. Funkcja korelacji cząstkowej była
+wyliczana poprzez identyfikację modeli AR($k$) o coraz większym stopniu $k$. Korelacja cząstkowa dla $k$ to $a_k$.
+
+Na rysunkach~\ref{fig:zd5_1} i \ref{fig:zd5_2} zamieszczone zostały wartości wspomnianych funkcji
+
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[AR(1)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_1_c_0}%
+	}%
+	\hfill%
+	\subfloat[AR(2)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_2_c_0}%
+	}%
+	
+	\subfloat[AR(3)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_3_c_0}%
+	}%
+	\hfill%
+	\subfloat[MA(1)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_0_c_1}%
+	}%
+	
+	\subfloat[MA(2)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_0_c_2}%
+	}%
+	\hfill%
+	\subfloat[MA(3)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_0_c_3}%
+	}%
+	
+	\caption{Unormowana funkcja autokowariancji i funkcja korelacji cząstkowej}
+	\label{fig:zd5_1}
+\end{figure}
+
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[MA(5)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_0_c_5}%
+	}%
+	
+	\subfloat[ARMA(3, 3)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_3_c_3}%
+	}%
+	
+	\subfloat[ARMA(1, 3)]{%
+		\includegraphics[width = 0.45 \linewidth]{zd5_a_1_c_3}%
+	}%
+
+	\caption{Unormowana funkcja autokowariancji i funkcja korelacji cząstkowej (ciąg dalszy)}
+	\label{fig:zd5_2}
+\end{figure}
+
+\subsection*{Obserwacje}
+\begin{itemize}
+\item Dla ciągów modeli AR($nA$) funkcja korelacji cząstkowej $K_{cz}(k)$ zeruje się dla $k > nA$.
+Natomiast funkcja autokowariancji dąży do zera, ale nigdy nie spada do niego gwałtownie.
+\item Ciągi MA($nC$) zachowują się odwrotnie: funkcja autokowariancji zeruje się dla $k > nC$, ale
+funkcja korelacji cząstkowej dąży do zera wraz ze wzrostem $k$, ale nigdy nie spada do niego skokowo.
+\item Modele ARMA mają własności będące połączeniem tych dwóch wymienionych wyżej, ale w najgorszym wariancie: żadna z funkcji nie zeruje się dla konkretnego przesunięcia $k$, natomiast wartości te spokojnie spadają do zera.
+\end{itemize}
+
+Trzeba jednak pamiętać, że to jak dobrze będzie widać te własności zależy od ilości danych pomiarowych jak
+i od samych wartości parametrów modeli.
+
+\clearpage
+\newpage
+
+\section*{Zadanie 6}
+Ostatnie zadanie jest sprawdzeniem wcześniej wysnutych wniosków w zadaniu praktycznym -- mamy dane
+pomiarowe, a poza tym nic nie wiemy o ich ,,rodzicach''. Na podstawie autokowariancji i korelacji cząstkowej
+staramy się poznać ich tożsamość.
+
+\subsection*{Obserwacje}
+\begin{enumerate}[a)]
+\item Autokowariancja raczej łagodnie zmierza do zera, natomiast dla korelacji cząstkowej widoczny jest gwałtowny spadek. Naszym zdaniem model to AR(5).
+\item Korelacja cząstkowa łagodnie dąży do zera, więc na pewno nie jest to model AR. Z autokowariancją
+nie jest tak łatwo -- z jednej strony widać gwałtwony spadek gdzieś dla $k = 3$, ale wartości te później
+wciąż oscylują ze znaczącym wartościami wokół zera. Danych było raczej niewiele (ok. 2000) w porównaniu do naszych poprzednich badań, więc być może z tego powodu granice nie są tak ostre. Model to MA(3) lub ARMA.
+Raczej stawiamy nasze pieniądze na MA(3).
+\item Obie funkcje wyraźne łagodnie dążą do zera. Model to ARMA.
+\item Korelacja cząstkowa wyraźne i gwałtownie staje się zerowa. Model to AR(4).
+\item Znów gwałtowny spadek korelacji cząstkowej, przy łagodnym spadku autokowariancji. Pomimo tego spadku, korelacja cząstkowa nie osiąga tak zerowych wartości jak byśmy tego chcieli. Może to wynikać z niedużej
+liczby danych. Mimo wszystko uważamy, że model to AR(2).
+\item Sytuacja analogiczna do poprzedniej -- AR(2).
+\end{enumerate}
+
+Jak widać zdobyta wiedza pozwoliła nam do pewnego stopnia zaproponować modele zdolne do opisu danych,
+ale mimo wszystko nie są to metody perfekcyjne. Po pierwsze w przypadku modeli ARMA trudniej jest określić stopnie (być może to my nie zauważyliśmy po prostu jakichś prawidłowości). Po drugie w przypadku niezbyt dużej liczby danych wszystko się trochę ,,rozmywa'' i trudniej jest ujrzeć gwałtowne spadki i wartości prawie-zerowe istotne przy określaniu stopni.
+
+\begin{figure}[p!]
+	\centering
+	
+	\subfloat[dane z pliku: \texttt{a1.txt}]{%
+		\includegraphics[width = 0.45 \linewidth]{zd6_a}%
+	}%
+	\hfill%
+	\subfloat[dane z pliku: \texttt{b1.txt}]{%
+		\includegraphics[width = 0.45 \linewidth]{zd6_b}%
+	}%
+	
+	\subfloat[dane z pliku: \texttt{c1.txt}]{%
+		\includegraphics[width = 0.45 \linewidth]{zd6_c}%
+	}%
+	\hfill%
+	\subfloat[dane z pliku: \texttt{d1.txt}]{%
+		\includegraphics[width = 0.45 \linewidth]{zd6_d}%
+	}%
+	
+	\subfloat[dane z pliku: \texttt{e1.txt}]{%
+		\includegraphics[width = 0.45 \linewidth]{zd6_e}%
+	}%
+	\hfill%
+	\subfloat[dane z pliku: \texttt{f1.txt}]{%
+		\includegraphics[width = 0.45 \linewidth]{zd6_f}%
+	}%
+	
+	\caption{Unormowana funkcja autokowariancji i funkcja korelacji cząstkowej (dane z plików zamieszczonych na platformie PZE)}
+	\label{fig:zd6}
+\end{figure}
+
+\clearpage
+\newpage
+
+\section*{Kod}
+Do realizacji zadań wyrzeźbiliśmy ogromne ilości kodu. Tutaj zamieścimy niektóre z nich, pozwalające uzyskać
+część z zamieszczonych wyników. Pozostałe można uzyskać przy drobnych modyfikacjach.
+
+\subsection*{Zadanie 1}
+\begin{lstlisting}
+clear all; close all; clc;
+
+a_arr = sort([-0.1, -0.8, 0.8, 0.1, 0.995, 2]);
+e = randn(1000, 1);
+
+for a = a_arr
+    y = filter([1], [1, a], e);
+    figure;
+    plot(y);
+    grid on;
+    xlabel('i'); ylabel('y');
+    [a, var(y)]
+    filename = ['zd1_ar_a_', num2str(a), '.png'];
+    exportgraphics(gcf, filename, 'Resolution', 200);
+end
+\end{lstlisting}
+
+\subsection*{Zadanie 2}
+\begin{lstlisting}
+clear all; close all; clc;
+
+a = 0.8;
+n = 100000;
+e = randn(n, 1);
+y = filter([1], [1, a], e);
+
+[xc, lags] = xcorr(y, 'biased');
+
+gamma = [];
+
+i_end = 100;
+
+gamma = 1 / (1 - a^2);
+for i = 1 : i_end
+    gamma(end + 1) = -a * gamma(end);
+end
+
+k = 0 : i_end;
+
+figure;
+stem(lags, xc, 'o');
+hold on;
+stem(k, gamma, 'x');
+hold off; grid on;
+xlabel('k'); ylabel('\gamma_k');
+xlim([0, 10]);
+legend('xcorr', 'analitycznie');
+
+filename = ['zd1_ar_gamma_n_', num2str(n), '_img1.png'];
+% exportgraphics(gcf, filename, 'Resolution', 200);
+
+xlim([0, 100]);
+filename = ['zd1_ar_gamma_n_', num2str(n), '_img2.png'];
+% exportgraphics(gcf, filename, 'Resolution', 200);
+\end{lstlisting}
+
+\subsection*{Zadanie 3}
+Zadanie 3 to wykonanie zadań 1 i 2 dla modelu MA(1). By to zrobić potrzebujemy dokonać drobnych modyfikacji.
+
+\subsection*{Zadanie 4}
+\begin{lstlisting}
+clear all; close all; clc;
+
+% generacja sygnału
+A = [1 -2.5 2 -0.5];
+e = randn(10000, 1);
+y = filter(1, A, e);
+
+figure; plot(y);
+grid on; xlabel('i'); ylabel('y(i)');
+
+% pierwsze różnicowanie
+y_1d = filter([1 -1], [1], y);
+
+figure; plot(y_1d);
+grid on; xlabel('i'); ylabel('y(i)');
+
+% drugie różnicowanie
+y_2d = filter([1 -1], [1], y_1d);
+
+figure; plot(y_2d);
+grid on; xlabel('i'); ylabel('y(i)');
+
+% ten sam efekt daje użycie modelu ARMA, lub skrócenie biegunów
+y_v2 = filter([1 -2 1], A, e);
+y_v3 = filter(1, [1 -0.5], e);
+
+figure; plot(y_v2);
+grid on; xlabel('i'); ylabel('y(i)');
+
+figure; plot(y_v3);
+grid on; xlabel('i'); ylabel('y(i)');
+
+% figure(1); exportgraphics(gcf, 'zd4_y.png', 'Resolution', 200);
+% figure(2); exportgraphics(gcf, 'zd4_y_1d.png', 'Resolution', 200);
+% figure(3); exportgraphics(gcf, 'zd4_y_2d.png', 'Resolution', 200);
+% figure(4); exportgraphics(gcf, 'zd4_y_v2.png', 'Resolution', 200);
+% figure(5); exportgraphics(gcf, 'zd4_y_v3.png', 'Resolution', 200);
+\end{lstlisting}
+
+\subsection*{Zadanie 5}
+\begin{lstlisting}
+clear all; close all; clc;
+
+% A = [1 0.8]; C = [1];
+% A = [1 0.8 0.6]; C = [1];
+% A = [1 0.7 0.3 0.45]; C = [1];
+% A = [1]; C = [1 0.5];
+% A = [1]; C = [1 -0.5 0.9];
+% A = [1]; C = [1 -0.5 0.9 -0.4];
+% A = [1]; C = [1 -2 0.7525 0.4998 -0.2004 -0.0505];
+% A = [1 -1.3 0.5 -0.056]; C = [1 -0.4 -0.34 0.156];
+A = [1 -0.7]; C = [1 -0.4 -0.34 0.156];
+
+e = randn(100000, 1);
+y = filter(C, A, e);
+
+[xc, lags] = xcorr(y, 'biased');
+xc = xc ./ xc(find(lags == 0));
+
+K_cz = [];
+k = 0 : 15;
+for i = k
+    i;
+    sys = armax(y, [i 0]);
+    K_cz(end + 1) = sys.A(end);
+end
+
+figure;
+stem(lags, xc, 'x');
+hold on;
+stem(k, K_cz, 'o');
+hold off;
+xlim([0, 15]); xlabel('k'); ylabel('r_k / K_cz(k)');
+grid on;
+legend('unormowana f. autokowariancji', 'korelacja cząstkowa');
+
+filename = ['zd5_a_', num2str(length(A) - 1), ...
+    '_c_', num2str(length(C) - 1), '.png'];
+exportgraphics(gcf, filename, 'Resolution', 200);
+\end{lstlisting}
+
+\subsection*{Zadanie 6}
+Zadanie 6 to wykonanie tego samego co w zadaniu 5, ale dla danych odczytywanych z plików.
+
+\end{document}

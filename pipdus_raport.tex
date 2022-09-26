@@ -1,0 +1,1475 @@
+\documentclass[11 pt]{article}
+
+\usepackage{polski}
+% \usepackage[utf8]{inputenc}
+% \usepackage[T1]{fontenc}
+\usepackage{indentfirst}
+% \usepackage{mathptmx}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\geometry{a4paper, margin = 2.5 cm}
+% \usepackage[dvipsnames, table]{xcolor}
+% \usepackage{epstopdf}
+\usepackage{amsmath}
+% \usepackage{amssymb}
+\usepackage{gensymb}
+\usepackage{subfig}
+\usepackage{multirow}
+% \usepackage{standalone}
+% \usepackage{tikz}
+% \usepackage{tabularx}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{array, makecell}
+\usepackage{boldline}
+\usepackage{chngcntr}
+
+\counterwithin{figure}{section}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textbf{PiPDUS} - Raport}
+\rhead{Sekcja 14: Skibiński, Kaźmieruk, Matynia}
+\cfoot{\thepage}
+
+\graphicspath{{./img/}}
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+		\textbf{\LARGE Projektowanie i Prototypowanie Dedykowanych Układów Sterowania}\\
+		
+		\vspace{0.5 cm}
+		
+		\textbf{\LARGE Raport z zajęć projektowych}\\
+		
+		\vspace{1.0 cm}
+		
+		{\Large Sekcja 14}
+		
+		\vspace{0.5 cm}
+		
+		{\large%
+		Maksymilian Skibiński\\%
+		Paweł Kaźmieruk\\%
+		Filip Matynia%
+		}
+		
+		\vspace{0.5 cm}
+		
+		{\large AiR III/5 - PO}\\
+
+		\vspace{2.0 cm}
+		
+		\vfill
+		
+		\begin{figure}[h]
+			\centering
+			\includegraphics[trim = 0 20mm 0 0, clip, width = 0.2 \linewidth]{C:/good_folder/nauka/inne/polsl_logo}
+		\end{figure}
+		
+		\vspace{0.5 cm}
+		
+		Wydział Automatyki, Elektroniki i Informatyki\\
+		Politechnika Śląska\\
+		\today{} r.
+	\end{center}
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\section*{Wstępne dane}
+\addcontentsline{toc}{section}{Wstępne dane}
+
+\paragraph{Temat:} Projekt dyskretnego układu regulacji dla silnika prądu stałego. Sterowanie pozycją wału silnika
+
+\paragraph{Obiekt regulacji:} Silnik szczotkowy prądu stałego pracujący pod pewnym obciążeniem.
+
+\paragraph{Cel projektu:} Zaprojektowanie i prototypowanie układu sterowania pozycji wału silnika.\\
+
+\begin{description}
+\item[Zakres sygnału sterującego:] $0 \; \div \; 15 \; [V]$
+\item[Zakres sygnału regulowanego:] $-\pi \; \div \; \pi \; [rad]$
+\item[Okres próbkowania:] $0.01 \; [s]$
+\end{description}
+
+\newpage
+
+\setcounter{section}{1}
+\setcounter{figure}{0}
+\section*{Zadanie nr 1 - Przeliczenie radianów na stopnie}
+\addcontentsline{toc}{section}{Zadanie nr 1 - Przeliczenie radianów na stopnie}
+
+Rozwiązanie zadania to zaledwie dołączenie jednego bloku \texttt{Gain} za modelem silnika. Wiedząc, że wyjście modelu jest podawane w radianach, oraz znając relację pomiędzy radianami, a stopniami, czyli:
+
+\begin{equation*}
+\pi \; rad = 180 \degree
+\end{equation*}
+
+mnożymy wyjście przez iloraz.
+
+\begin{figure}[h!]
+	\center
+	\fbox{\includegraphics[width = 0.4 \linewidth]{zd1/zd1_img1.png}}
+	\caption{Realizacja w Simulinku}
+\end{figure}
+
+\newpage
+
+\setcounter{section}{2}
+\setcounter{figure}{0}
+\section*{Zadanie nr 2 - Charakterystyka statyczna}
+\addcontentsline{toc}{section}{Zadanie nr 2 - Charakterystyka statyczna}
+
+Po wykonaniu kilku testów otrzymujemy następujące wykresy:
+
+\newcommand{\w}{0.9}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.1 \linewidth]{zd2/zd2_powyzej}
+	}
+	\caption{Odpowiedź układu dla wymuszeń powyżej 7.5 V}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.1 \linewidth]{zd2/zd2_ponizej}
+	}
+	\caption{Odpowiedź układu dla wymuszeń poniżej 7.5 V}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\center
+	\includegraphics[width = \linewidth]{zd2/zd2_75}
+	\caption{Odpowiedź układu dla wymuszenia 7.5 V}
+\end{figure}
+
+Biorąc pod uwagę zakres sygnału sterującego (od 0 V do 15 V), możemy wysunąć następujące wnioski:
+
+\begin{description}
+\item[u > 7.5 V] odpowiedź układu dąży do nieskończoności, a większe wymuszenie powoduje wzrost prędkości odpowiedzi.
+\item[u < 7.5 V] odpowiedź układu dąży do ujemnej nieskończoności, a mniejsze wymuszenie powoduje wzrost prędkości odpowiedzi (tym razem w stronę $- \infty$).
+\item[u = 7.5 V] odpowiedź układu jest zerowa, widać tylko efekt działania szumu.
+\end{description}
+
+Ze względu na to, że wyjście modelu silnika jest ograniczane (zakres sygnału regulowanego to $-180 \degree \; \div \; 180 \degree$), sygnał regulowany nie osiąga nieskończoności tylko górną albo dolną granicę zakresu. Łatwo też zauważyć, że zmiany wymuszenia, powodują zmiany nachylenia odpowiedzi.\\
+
+Z wykresów łatwo widać, że badamy tutaj element całkujący rzeczywisty, czy całkujący z inercją I rzędu. Gdyby element był natomiast idealny to w odpowiedziach nie byłoby widać, na początku osiągania ostatecznej prędkości, tylko widać byłoby w momencie startu symulacji, linię prostą. Elementy całkujące rzeczywiste są opisywane następującą transmitancją:
+
+\begin{equation*}
+K(s) = \frac{k}{s(1 + sT)}
+\end{equation*}
+
+Nie jesteśmy w stanie wyznaczyć charakterystyki statycznej dla tego obiektu. Wyjście układu nigdy nie przestaje się zmieniać (poza przypadkiem dla wymuszenia 7.5 V).
+
+\newpage
+
+\setcounter{section}{3}
+\setcounter{figure}{0}
+\section*{Zadanie nr 3 - Przykładowa odpowiedź skokowa układu}
+\addcontentsline{toc}{section}{Zadanie nr 3 - Przykładowa odpowiedź skokowa układu}
+
+\begin{figure}[h!]
+	\center
+	\includegraphics[width = \linewidth]{zd3/zd3_img1}
+	\caption{Odpowiedź układu dla wymuszenia 11.25 V}
+\end{figure}
+
+Tak jak zostało to opisane w poprzednim zadaniu, badany obiekt to element całkujący z inercją. Jest to układ II rzędu. Opisujemy go następującą transmitancją:
+
+\begin{equation*}
+K(s) = \frac{k}{s(1 + sT)}
+\end{equation*}
+
+\begin{itemize}
+\item[-] Wzmocnienie k odpowiada za nachylenie odpowiedzi (linii prostej wrysowanej w odpowiedź).
+\item[-] Stała czasowa T, odpowiada za tempo ustalenia się prędkości odpowiedzi.
+\end{itemize}
+
+\newpage
+
+\setcounter{section}{4}
+\setcounter{figure}{0}
+\section*{Zadanie nr 4 - Identyfikacja modelu obiektu regulacji}
+\addcontentsline{toc}{section}{Zadanie nr 4 - Identyfikacja modelu obiektu regulacji}
+
+Model silnika możemy aproksymować transmitancją:
+
+\begin{equation*}
+K_a(s) = \frac{k}{s} \, e^{-s T_0} = \frac{1}{Ts} \, e^{-s T_0}
+\end{equation*}
+
+gdzie $k = \displaystyle \frac{1}{T}$.\\
+
+Do wyznaczenia parametrów transmitancji aproksymującej, potrzebujemy przeanalizować odpowiedź skokową układu. Może to być ta sama odpowiedź co w poprzednim zadaniu.
+
+\begin{figure}[h!]
+	\center
+	\includegraphics[width = \linewidth]{zd3/zd3_img1}
+	\caption{Odpowiedź układu dla wymuszenia 11.25 V}
+\end{figure}
+
+W instrukcji do ćwiczeń nr 5 jest opisany sposób na wyznaczenie tych wartości.
+
+\begin{figure}[h!]
+	\center
+	\fbox{\includegraphics[width = 0.82 \linewidth]{zd4/zd4_img1}}
+	\caption{Wyznaczanie parametrów}
+	Źródło: Instrukcja do ćwiczeń nr 5.
+\end{figure}
+
+\newpage
+
+Wymuszenie $u_0$ to wartość dla której nasz układ daje na wyjściu $0 \degree$. W naszym przypadku $u_0 = 7.5 \, V$. Skoro wykonujemy odpowiedź skokową dla wymuszenia 11.25 V, to $\Delta u = 3.75 \, V$.
+
+Teraz potrzebujemy wybrać dwa punkty odpowiedzi układu.
+
+\begin{figure}[h!]
+	\center
+	\includegraphics[width = \linewidth]{zd4/zd4_img2}
+	\caption{Wybranie dwóch punktów}
+\end{figure}
+
+\begin{figure}[h!]
+	\center
+	\includegraphics[width = \linewidth]{zd4/zd4_img3}
+	\caption{Wrysowanie linii prostej}
+\end{figure}
+
+Ze względu na szumy pomiarowe może zdarzyć się, że ostatecznie nie uda się nam wystarczająco dobrze wrysować prostej. Trzeba wtedy po prostu ponowić dobór dwóch punktów. Przy doborze punktów, trzeba też pamiętać, by znajdowały się one ,,w drugiej części'' odpowiedzi, tzn. w rejonie gdzie sygnał regulowany przybiera wartości $90 \degree \; \div \; 180 \degree$. Wtedy też prędkość narastania sygnału powinna się już nie zmieniać.
+
+\newpage
+
+Stałą $T_0$, wyznaczamy znając czas przecięcia się wyznaczonej linii prostej z linią prostą dla $y = 0 \degree$. Ostatecznie $T_0 = 0.9 \, s$.
+
+Do obliczenia pozostałych parametrów dla dwóch wybranych punktów, obliczamy ich przyrosty. Otrzymujemy:
+
+\begin{itemize}
+\item[] $\Delta y = 54.6 \, \degree$
+\item[] $\Delta t = 1.48 \, s$
+\end{itemize}
+
+A znając te wartości obliczamy pozostałe.
+
+\begin{itemize}
+\item[] $R = 36.8919 \frac{\degree}{s}$
+\item[] $T = 0.1016 \frac{s \cdot V}{\degree}$
+\item[] $k = 9.8378 \frac{\degree}{s \cdot V}$
+\end{itemize}
+
+Otrzymujemy transmitancję aproksymującą o następujących wartościach:
+
+\begin{equation*}
+K(s) = \frac{9.8378}{s} e^{-s \cdot 0.9}
+\end{equation*}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.2 \linewidth]{zd4/zd4_img4}
+	}
+	\caption{Wynik aproksymacji}
+\end{figure}
+
+Widać zatem odpowiedź, której można było się spodziewać, po transmitancji. Jest to odpowiedź elemntu całkującego idealnego z opóźnieniem. Jednak, jako że zidentyfikowaliśmy już wcześniej model obiektu to możemy sprawdzić jak sprawdzi się aproksymacja transmitancją innego typu, tzn. elementu całkującego z inercją.
+
+\newpage
+
+Dla podanej transmitancji:
+
+\begin{equation*}
+K(s) = \frac{9.8378}{s(1 + s \cdot 0.9)}
+\end{equation*}
+
+Otrzmujemy następującą odpowiedź:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.2 \linewidth]{zd4/zd4_img5}
+	}
+	\caption{Wynik aproksymacji}
+\end{figure}
+
+Jak widać zmianie uległ tylko początek aproksymacji, tzn. dla elementu całkującego idealnego (poprzedni wykres), odpowiedź była po prostu opóźniona, ale po nim widzieliśmy linię prostą o stałym nachyleniu, czyli stałej prędkości. Tutaj prędkość jest osiągana z czasem.
+
+Oba te modele dobrze przybliżają zachowanie badanego obiektu, ale najważniejsze jest to, że mamy wartości z których możemy korzystać przy wyznaczaniu nastaw regulatorów.
+
+\newpage
+
+\setcounter{section}{5}
+\setcounter{figure}{0}
+\section*{Zadanie nr 5 - Wybór regulatorów}
+\addcontentsline{toc}{section}{Zadanie nr 5 - Wybór regulatorów}
+
+Wybrane przez nas regulatory to P oraz PD. W układzie już mamy całkę, ze względu na to, że badany obiekt to element całkujący, zatem stosowanie regulatorów PI czy PID nie ma sensu. Nic dodatkowego nie osiągniemy przez zastosowaniem członu I w badanym przez nas obiekcie. Człon całkujący tylko niepotrzebnie spowolni odpowiedź układu regulacji, a uchybu i tak nie będzie, ze względu na typ obiektu.
+
+Natomiast, regulatorami P i PD, możemy poprawić dynamikę układu zamkniętego, czas ustalania się odpowiedzi oraz zmniejszyć przeregulowanie.
+
+Budując układ regulacji bez regulatora, czyli de facto, zamykając po prostu badany obiekt w pętli sprzężenia zwrotnego, możemy zweryfikować nasze wstępne założenia co do regulatorów.
+
+\begin{figure}[h!]
+	\centerline{
+		\fbox{\includegraphics[width = 1 \linewidth]{zd5/zd5_img1}}
+	}
+	\caption{Układ zamknięty}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+		\fbox{\includegraphics[width = 0.7 \linewidth]{zd5/zd5_img2}}
+	}
+	\caption{Model silnika - sterowanie}
+\end{figure}
+
+Do wyznaczania wykresów w układzie regulacji zapamiętujemy 3 wartości: wartość zadana (set point), sterowanie oraz sygnał regulowany (y). Dodatkowo ze względu na to, że badany układ daje na wyjściu $0 \degree$ dla 7.5 V, dodajemy to wymuszenie na wejście. Teraz możemy przeprowadzić testy dla kilku przykładowych wartości zadanych.
+
+\newpage
+
+\subsection*{Odpowiedzi układu regulacji bez regulatora}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.1 \linewidth]{zd5/zd5_sp90}
+	}
+	\caption{set point = $90 \degree$}
+	\label{fig:zd5}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.1 \linewidth]{zd5/zd5_sp150}
+	}
+	\caption{set point = $150 \degree$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.1 \linewidth]{zd5/zd5_sp_20}
+	}
+	\caption{set point = $-20 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width =  1.1 \linewidth]{zd5/zd5_sp_115}
+	}
+	\caption{set point = $-115 \degree$}
+\end{figure}
+
+Jak widać, zgodnie z oczekiwaniami uchybu nie ma. Człon całkujący zatem, tak jak napisaliśmy, nie będzie potrzebny.
+
+\newpage
+
+\setcounter{section}{6}
+\setcounter{figure}{0}
+\section*{Zadanie nr 6 - Wstępne parametry regulatorów}
+\addcontentsline{toc}{section}{Zadanie nr 6 - Wstępne parametry regulatorów}
+
+Do wyznaczenia nastaw zaproponowanych przez nas regulatorów, wykorzystujemy instrukcję do ćwiczeń nr 6:
+
+\begin{itemize}
+\item[P]: $k_r = 0.37 \cdot \frac{T}{T_0}$
+\item[PD]: $k_r = 0.65 \cdot \frac{T}{T_0}$, $T_D = 0.23 \cdot T_0$
+\end{itemize}
+
+Dla regulatora PD nie znaleźliśmy w instrukcji wzorów na optymalne nastawy. Wzięliśmy zatem nastawy dla reg. PID i wyzerowaliśmy działanie członu I (czyli $T_I = \infty$). Wiąże się to z tym, że nastawy te będzie trzeba trochę pozmieniać bardziej metodą ,,inżynierską'', czyli kręcąc wartościami nastaw, aż uzyskamy satysfakcjonujący rezultat.
+
+Do wybrania nastaw korzystamy z kilku punktów pracy\footnote{Wyznaczanie tych wartości było prowadzone w taki sam sposób jak w zadaniu nr 4.}:
+
+\begin{table}[h!]
+	\center
+	\begin{tabular}{|c|c|c|c|}
+	\hline
+	\multirow{2}{*}{$\Delta u \; [V]$} & \textbf{P} & \multicolumn{2}{c|}{\textbf{PD}}\\
+	\cline{2-4}
+	& $k_r$ $[\frac{V}{\degree}]$ & $k_r$ $[\frac{V}{\degree}]$ & $T_D$ $[s]$\\
+	\hline
+	0.5 & 0.0409 & 0.0718 & 0.207\\
+	2.5 & 0.0413 & 0.0725 & 0.207\\
+	3.75 & 0.0418 & 0.0734 & 0.207\\
+	4.5 & 0.0421 & 0.0740 & 0.207\\
+	6 & 0.0427 & 0.0750 & 0.207\\
+	7 & 0.0429 & 0.0753 & 0.207\\
+	\hline
+	\end{tabular}
+	\caption{Obliczane nastawy dla kilku punktów pracy}
+	Wyrażamy je jako odchylenie $\Delta u$, względem wymuszenia 7.5 V.
+	\label{tb:nastawy}
+\end{table}
+
+Jak łatwo zauważyć wzmocnienia $k_r$ ulegają drobnym zmianom, a stała różniczkowania $T_D$ się nie zmienia (stała opóźnienia $T_0$ jest taka sama dla wszystkich punktów pracy). Zgodnie z instrukcją wybieramy wartości średnie. Zatem do dalszych badań układu regulacji wybieramy:
+
+\begin{itemize}
+\item[P]: $k_r = 0.0419$ $\frac{V}{\degree}$
+\item[PD]: $k_r = 0.0737$ $\frac{V}{\degree}$, $T_D = 0.207 \; s$
+\end{itemize}
+
+\newpage
+
+\setcounter{section}{7}
+\setcounter{figure}{0}
+\section*{Zadanie nr 7 - Budowa układu regulacji}
+\addcontentsline{toc}{section}{Zadanie nr 7 - Budowa układu regulacji}
+
+Budujemy układ regulacji - taki sam jak przedstawiliśmy w rozwiązaniu zadania nr 5, ale tym razem dodajemy regulator.
+
+\begin{figure}[h!]
+	\centerline{
+		\fbox{\includegraphics[width = \linewidth]{zd7/zd7_img1}}
+	}
+	\caption{Układ regulacji}
+\end{figure}
+
+\newpage
+
+\setcounter{section}{8}
+\setcounter{figure}{0}
+\section*{Zadanie nr 8 - Testowanie regulatorów}
+\addcontentsline{toc}{section}{Zadanie nr 8 - Testowanie regulatorów}
+
+\vspace{-0.25 cm}
+
+\subsubsection*{Regulator P}
+
+\renewcommand{\w}{0.7}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_P_sp10}
+	}
+	\caption{Reg. P, set point = $10 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_P_sp90}
+	}
+	\caption{Reg. P, set point = $90 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_P_sp160}
+	}
+	\caption{Reg. P, set point = $160 \degree$}
+\end{figure}
+
+\newpage
+
+\renewcommand{\w}{0.73}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_P_sp_45}
+	}
+	\caption{Reg. P, set point = $-45 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_P_sp_110}
+	}
+	\caption{Reg. P, set point = $-110 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_P_sp_175}
+	}
+	\caption{Reg. P, set point = $-175 \degree$}
+\end{figure}
+
+\newpage
+
+\subsubsection*{Regulator PD}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_PD_sp30}
+	}
+	\caption{Reg. PD, set point = $30 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_PD_sp85}
+	}
+	\caption{Reg. PD, set point = $85 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_PD_sp141}
+	}
+	\caption{Reg. PD, set point = $141 \degree$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_PD_sp_15}
+	}
+	\caption{Reg. PD, set point = $-15\degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_PD_sp_78}
+	}
+	\caption{Reg. PD, set point = $-78 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd8/zd8_PD_sp_165}
+	}
+	\caption{Reg. PD, set point = $-165 \degree$}
+\end{figure}
+
+\newpage
+
+\subsubsection*{Dodatkowe porównanie regulatorów}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.1 \linewidth]{zd8/zd8_por1}
+	}
+	\caption{Porównanie wpływu regulatorów na odpowiedź układu regulacji, set point = $90 \degree$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.1 \linewidth]{zd8/zd8_por2}
+	}
+	\caption{Sterowania dla regulatorów}
+\end{figure}
+
+\newpage
+
+\subsection*{Wnioski}
+
+\begin{itemize}
+\item[-] W zadaniu nr 6 wyznaczone zostały nastawy regulatorów w zależności od użytego punktu pracy (tabela nr \ref{tb:nastawy}), które różniły się w bardzo małym stopniu. Na tyle małym, że bez względu na to, które byśmy użyli (wzięliśmy średnie), to i tak uzyskalibyśmy bardzo podobne odpowiedzi układu.
+\item[-] Przeglądając odpowiedzi układu regulacji dla reg. P i PD pierwszą różnicą, która może rzucić się w oczy jest sterowanie. Łatwo zauważyć, że dla obu regulatorów kształt wykresu sterowania jest taki sam, tzn. gdy następuje zmiana wartości zadanej, sterowanie skacze albo w górę, gdy set point jest dodatni, albo w dół, gdy set point jest ujemny, a następnie stopniowo wraca do wymuszenia 7.5 V, które utrzymuje stan ustalony. Różnicą natomiast są szumy. Wykres sterowania dla reg. PD, rezygnując z języka technicznego, dużo bardziej rzuca się w oczy, ,,jest go więcej''. Człon różniczkujący wzmacnia działanie szumów, i dla tego sterowanie ulega znacznie większym zmianom, niż dla reg. P, gdzie jego zmiany są dużo łagodniejsze.
+\item[-] Wyznaczone wzmocnienia regulatora $k_r$, które są mniejsze niż 1 (jednostka), powodują, że sterowania nie osiągają nasyceń\footnote{W przypadku reg. PD, człon D na tyle wmacnia szumy, że jednak w momencie skoku wartości zadanej, przez krótki okres czasu nascycenie jest osiągane}. Dla układu zamkniętego bez regulatora (zadanie nr 5, strona \pageref{fig:zd5}), widać jak mocnym zmianom ulega sterowanie w zależności od uchybu - wystarczająco mocnym do osiągania przez sterowanie nasyceń.
+\item[-] Na pewno możemy powiedzieć, że użycie regulatorów, poprawiło układ regulacji. 
+
+\begin{itemize}
+\item[-] Odpowiedź skokowa dla układu bez regulatora miała znaczne oscylacje, które zostały wyeliminowane przez regulatory. 
+\item[-] Czas osiągnięcia stanu ustalonego właściwie nie uległ zmianom.
+\item[-] Regulatory zmniejszyły przeregulowanie układu.
+\end{itemize}
+\end{itemize}
+
+W tym zadaniu nastawy regulatorów zostały obliczone przy pomocy wzorów. Trzeba jednak pamiętać o tym, że rzeczywiste obiekty nie są na tyle proste, by można je w całości poprawnie opisać, tak jak my to zrobiliśmy, transmitancją II rzędu. W rzeczywistym świecie dzieje się znacznie wiecej i dlatego wzory na, rzekomo, optymalne nastawy powinniśmy traktować jako dobry punkt startu na drodze do uzyskania optymalnych nastaw dla badanego obiektu.
+
+\newpage
+
+\setcounter{section}{9}
+\setcounter{figure}{0}
+\section*{Zadanie nr 9 - Próba poprawy jakości regulacji}
+\addcontentsline{toc}{section}{Zadanie nr 9 - Próba poprawy jakości regulacji}
+
+\subsection*{Regulator P}
+\addcontentsline{toc}{subsection}{Regulator P}
+
+\subsubsection*{Sygnał prostokątny}
+
+Zaczynamy od podania jako wartości zadanej sygnału prostokątnego o parametrach:
+
+\begin{itemize}
+\item[]Amplituda = $90 \degree$
+\item[]Okres = 40 s
+\end{itemize}
+
+Teraz sprawdzimy jak odpowiedzi układu ulegną zmianie, zmieniając wzmocnienie regulatora.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_rect1}
+	}
+	\caption{Sygnał prostokątny, reg. P: $k_r = 0.0419$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_rect2}
+	}
+	\caption{Sygnał prostokątny, reg. P: $k_r = 0.0733$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_rect3}
+	}
+	\caption{Sygnał prostokątny, reg. P: $k_r = 0.0210$}
+\end{figure}
+
+Na pierwszym rysunku widać zachowanie się odpowiedzi dla nastaw wyznaczonych w poprzednim zadaniu. Odpowiedź jest raczej zadowalająca, ale widać tu lekkie przeregulowanie, więc możemy postarać się to poprawić. Zwiększając wymuszenie poprawiliśmy prędkość narastania, ale powstało jeszcze większe przegulowanie, a czas regulacji jest taki sam. Zmniejszając wzmocnienie udało nam się usunąć przeregulowanie, ale znacząco zwolniliśmy odpowiedź. Widzimy jednak, że powinniśmy celować w mniejsze wzmocnienia do uzyskania naszych celów.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_rect4}
+	}
+	\caption{Sygnał prostokątny, reg. P: $k_r = 0.0356$}
+\end{figure}
+
+Ostatecznie dobieramy wzmocnienie na rysunku wyżej. Jest ono trochę mniejsze niż wyznaczone za pomocą wzorów, ale zdołaliśmy usunąć przeregulowanie.
+
+\newpage
+
+\subsubsection*{Sygnał sinusoidalny}
+
+Tym razem stosujemy wymuszenie sinusoidalne o parametrach:
+
+\begin{itemize}
+\item[]Amplituda = $90 \degree$
+\item[]Częstotliwość = $0.05 \; \frac{rad}{s}$
+\end{itemize}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_sin1}
+	}
+	\caption{Sygnał sinusoidalny, reg. P: $k_r = 0.0419$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 0.9 \linewidth]{zd9/P/zd9_P_sin2}
+	}
+	\caption{Sygnał sinusoidalny, reg. P: $k_r = 0.0419$, zbliżenie}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_sin3}
+	}
+	\caption{Sygnał sinusoidalny, reg. P: $k_r = 0.0210$}
+\end{figure}
+
+Znów zaczynamy od nastaw wyznaczonych w poprzednim zadaniu. Widać, że nadążanie można by poprawić. Zmniejszenie wzmocnienia, jak się można domyślić, tylko pogarsza sprawę - układ reaguje wolniej, bo stosuje mniejsze sterowania. Trzeba zatem spróbować zwiększyć wzmocnienie.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_sin4}
+	}
+	\caption{Sygnał sinusoidalny, reg. P: $k_r = 0.168$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/P/zd9_P_sin5}
+	}
+	\caption{Sygnał sinusoidalny, reg. P: $k_r = 0.168$, zbliżenie}
+\end{figure}
+
+Stosując takie wzmocnienie zdolność układu do nadążania za wymuszeniem, ulega znacznej poprawie.
+
+W treści zadania jesteśmy także proszeni o przetestowanie działania układu dla różnych częstotliwości sinusoidy. Stosując mniejsze częstotliwości, niż użyta, czyli $0.05 \; \frac{rad}{s}$, układ będzie cały czas dobrze nadążał za wymuszeniem. Zwiększając częstotliwość, możemy znaleźć częstotliwość rezonansową, gdzie amplituda wyjścia jest znacznie większa niż wejścia, a zwiększając go jeszcze bardziej amplituda sygnału regulowanego będzie stopniowo malała. Wartości częstotliwości dla których, te sytuacje zachodzą, zależą od wzmocnienia regulatora.
+
+Lepiej wpływ częstotliwości będzie widać w następnym podpunkcie.
+
+\subsubsection*{Chirp signal}
+
+Chirp signal to sygnał sinusoidalny, którego częstotliwość liniowo rośnie. Jako parametry podajemy mu wartości częstotliwości na początku i końcu działania oraz czas w jakim ma działać. Jego działanie pokażemy na kilku grupach parametrów.
+
+\newpage
+
+\renewcommand{\w}{0.855}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_10}
+	}
+	\caption{Chirp signal: $0.01 \; \frac{rad}{s} \rightarrow 0.1 \; \frac{rad}{s}$, reg. P: $k_r = 0.168$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_11}
+	}
+	\caption{Chirp signal: $0.1 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. P: $k_r = 0.168$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_12}
+	}
+	\caption{Chirp signal: $1 \; \frac{rad}{s} \rightarrow 10 \; \frac{rad}{s}$, reg. P: $k_r = 0.168$}
+\end{figure}
+
+\newpage
+
+Z wykresów widać, to co napisaliśmy na końcu podpunktu, który dotyczył wymuszenia sinusoidalnego. Dla mniejszych częstotliwości układ bardzo dobrze nadąża za sygnałem. Od pewnej częstotliwości amplituda wyjścia nie będzie pokrywać się z amplitudą wejścia - amp. wyjścia będzie stopniowo rosła, aż uzyska maksmimum dla częstotliwości rezonansowej i zacznie maleć. Tak maleć będzie już cały czas ze wzrostem częstotliwości.
+
+Podobne wnioski możemy wysnuć wykreślając ch-kę Bodego. Tę wykreślamy dla transmitancji elementu całkującego z inercją $K(s) = \displaystyle \frac{k}{s(1 + Ts)}$ w układzie zamkniętym z regulatorem.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_16}
+	}
+	\caption{Charakterystyka Bodego, reg. P: $k_r = 0.168$}
+\end{figure}
+
+Jednak taka charakterystyka nie pokrywa się w całości z tym co widzimy na wyjściu układu po zastosowaniu chirp signalu. Po pierwsze pik rezonansowy, czyli wzmonienie amplitudy dla częst. rezonansowej, jest większy niż to co odczytujemy z wykresów układu regulacji. Wynika to z tego, że w symulowanym układzie znajdują się bloki \texttt{Saturation}, które ograniczają nam zakres zmian sterowania i wyjścia. Takie ograniczenie nie zostało uwzględnione przy wykreślaniu ch-ki Bodego dla transmitancji aproksymującej. Na wykresach widzimy, że sterowanie zaczyna osiągać nasycenia, właśnie przed częstotliwością rezonansową.
+
+Takie ograniczenia wpływają też na to, że pik rezonansowy zostaje osiągnięty dla innej częstotliwości. Z ch-ki amplitudowej wynika, że $\omega_{rez} \approx 1.1 \; \frac{rad}{s}$, a z symulacji chirp signalem, $\omega_{rez} \approx 0.7 \; \frac{rad}{s}$.
+
+By sprawdzić nasze założenia co do powodu różnic, możemy w ramach testu usunąć na chwilę ograniczenia sygnału sterującego oraz sygnału sterowanego i sprawdzić jak będzie wyglądała teraz odpowiedź układu na wymuszenie chirp signal.
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_no_sat}
+	}
+	\caption{Układ bez ograniczeń, chirp signal: $0.5 \; \frac{rad}{s} \rightarrow 1.6 \; \frac{rad}{s}$, reg. P: $k_r = 0.168$}
+\end{figure}
+
+Teraz widać, że pik rezonansowy ma miejsce, gdzieś w czasie od 1000 s do 1200 s, czyli $\omega_{rez} \approx 1.05 \; \frac{rad}{s}$, co pokrywa się z ch-ką Bodego. Także wartość wzmocnienia amplitudy dla tej częstotliwości się pokrywa.
+
+Ostatecznie jednak, ten test nie ma większego znaczenia na drodze do poprawienia jakości regulacji. Dzięki niemu widzimy dlaczego ch-ka Bodego nie do końca pokrywa się z odpowiedzią układu rzeczywistego, ale to co zrobiliśmy, by poznać powód różnic, czyli usunięcie ograniczeń, to de facto ingerowanie w możliwości badanego obiektu rzeczywistego. My jednak nie chcemy go zmieniać, natomiast wykorzystać go tak dobrze jak się da.
+
+Trzeba zatem pamiętać, że wykreślenie ch-ki Bodego dla transmitancji aproksymującej dało nam informację jak ogólnie układ będzie zachowywał się w zależności od częstotliwości wymuszenia sinusoidalnego, tak że wiemy gdzie czego się spodziewać, ale jednak wykreślenie ch-ki dla trans. aproksymującej nie da rezultatu, który w całości pokryje się z rzeczywistością.\\
+
+Stosując inne wzmocnienia regulatora, także zauważymy to co napisaliśmy pod koniec podpunktu poświęconego wymuszeniu sinusoidalnemu. Zmieniając wzmocnienie zmianie ulegać będą częstotliwości dla których układ zachowuje się w inny sposób.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_13}
+	}
+	\caption{Chirp signal: $0.1 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. P: $k_r = 0.419$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_14}
+	}
+	\caption{Chirp signal: $0.1 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. P: $k_r = 0.0419$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_17}
+	}
+	\caption{Charakterystyka Bodego, reg. P: $k_r = 0.419$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/P/zd9_P_15}
+	}
+	\caption{Charakterystyka Bodego, reg. P: $k_r = 0.0419$}
+\end{figure}
+
+\newpage
+
+Stosując większe wzmocnienie, wzrosła częstotliwość rezonansowa, oraz, wnioskując po profilu zmian amplitudy, pasmo częstotliwości, dla których następuje wzmocnienie amplitudy jest węższe. Dla mniejszego wzmocnienia nie zaobserwowaliśmy piku rezonansowego - amplituda odpowiedzi układu dla wykorzystanych częstotliwości maleje.
+
+Podobne wnioski możemy napisać po wykreśleniu charakterystyk Bodego, choć znów musimy pamiętać o różnicach spowodowanych ograniczeniami rzeczywistych elementów. W przypadku wzmocnienia $k_r = 0.419$ $\frac{V}{\degree}$, moglibyśmy wywnioskować, że wzmocnienie sygnału dla częst. rezonansowej będzie znacznie większe niż poprzednio dla $k_r = 0.168$ $\frac{V}{\degree}$, ale jak widać po przebiegu odpowiedzi układu na sygnał chirp signal, rzeczywiste ograniczenia powodują, że czegoś takiego jednak nie udaje się zaobserwować.
+
+\newpage
+
+\subsection*{Regulator PD}
+\addcontentsline{toc}{subsection}{Regulator PD}
+
+\subsubsection*{Sygnał prostokątny}
+
+Sygnał prostokątny o tych samych parametrach:
+
+\begin{itemize}
+\item[]Amplituda = $90 \degree$
+\item[]Okres = 40 s
+\end{itemize}
+
+Zaczynamy od nastaw poprzednio wyznaczonych:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect1_0}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0737$, $T_D = 0.207$}
+\end{figure}
+
+Tym razem mamy dwa ,,pokrętła", a jedno z nich jest takie samo jak poprzednio. Ogólnie więc mamy duże większe możliwości. Wpływ zmiany wzmocnienia $k_r$, będzie taki sam jak w poprzednim regulatorze, tzn. zwiększając je układ będzie reagował szybciej, bardziej agresywnie, a także zwiększy się przeregulowanie. Potrzebujemy teraz zbadać, wpływ czasu różniczkowania na odpowiedź.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect2_0}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0737$, $T_D = 0.621$}
+	\label{fig:pd2}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect3_0}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0737$, $T_D = 1.035$}
+	\label{fig:pd3}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect4_0}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0737$, $T_D = 0.1035$}
+	\label{fig:pd4}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect5_0}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0737$, $T_D = 0.4347$}
+	\label{fig:pd5}
+\end{figure}
+
+\newpage
+
+Zwiększając czas różniczkowania, udało nam się zlikwidować przeregulowanie (rys. \ref{fig:pd2}), ale sygnał narasta wolniej. Zwiększając $T_D$ jeszcze bardziej (rys. \ref{fig:pd3}), psujemy jakość regulacji. Układ odpowiada dużo gorzej, a także bardzo dobrze widzimy jak duży wpływ mają szumy w przypadku członu różniczkującego - odpowiedź układu jest dużo bardziej ,,losowa''. Łatwo też zauważyć jak zmienia się sterowanie, tutaj też widzimy, że wpływ szumów został wzmocniony - analizując przebieg sterowania, w takim horyzoncie czasowym nie starcza nam pikseli, by poprawnie zauważyć jakiekolwiek zmiany, sygnał sterujący po prostu cały czas skacze. Jeśli zmniejszymy $T_D$, widzimy, że zwiększyło się przeregulowanie, ale także szybkość odpowiedzi.
+
+Widzimy zatem, że moglibyśmy postarać się trochę zwiększyć wpływ członu różniczkującego, tak by jak najlepiej usunąć przeregulowanie, ale jednocześnie mając na uwadze wpływ szumu. Ostatecznie osiągamy to na rys. \ref{fig:pd5}. Musimy jednak też zauważyć, że człon D spowodował pewne oscylacje w stanie ustalonym.
+
+Wyjawia się nam zatem pewien pomysł - możemy najpierw zmieniać wzmocnienie $k_r$, a następnie starać się członem D, zminimalizować przeregulowanie.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect1}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0590$, $T_D = 0.207$}
+	\label{fig:pd5}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect2}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0590$, $T_D = 0.4554$}
+	\label{fig:pd5}
+\end{figure}
+
+\newpage
+
+Tak też zrobiliśmy dla mniejszego wzmocnienia. Teraz możemy porównać, dwie odpowiedzi ze sobą, tzn. tę poprzednią dla większego wzmocnienia i tę dla mniejszego.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect3}
+	}
+	\caption{Porównanie dwóch regulatorów PD}
+	\label{fig:pd_por1}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect4}
+	}
+	\caption{Porównanie dwóch regulatorów PD - zbliżenie na dojście do stanu ustalonego}
+	\label{fig:pd_por2}
+\end{figure}
+
+Widać, że dla mniejszego wzmocnienia otrzymaliśmy układ, który reaguje trochę wolniej, ale ma też trochę mniejsze przeregulowanie i właściwie brak oscylacji w stanie ustalonym. Teraz sprawdzimy co się stanie dla większego wzmocnienia.
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect6}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0103$, $T_D = 0.207$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect7}
+	}
+	\caption{Sygnał prostokątny, reg. PD: $k_r = 0.0103$, $T_D = 0.362$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect8}
+	}
+	\caption{Porównanie dwóch regulatorów PD}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_rect9}
+	}
+	\caption{Porównanie dwóch regulatorów PD - zbliżenie na dojście do stanu ustalonego}
+\end{figure}
+
+Znów stwierdzamy, że większe wzmocnienie pozwoli nam na szybszą reakcję, ale kosztem większego przeregulowania i oscylacji w stanie ustalonym.
+
+Po tych kilku próbach możemy stwierdzić, że dla większych wzmocnień powinniśmy stosować mniejsze czasy różniczkowania - to ich iloczyn odpowiada za wzmocnienie różniczkujące. Widać, też że dla większych wzmocnień nie jesteśmy w stanie tak dobrze usunąć przeregulowania i oscylacji.
+
+Ostatecznie decydujemy się na nastawy z rys. \ref{fig:pd5}. Jako, że teraz mieliśmy dwa człony do ustawienia, to oczekujemy, że będzie lepiej niż w przypadku reg. P, który można de facto nazwać podzbiorem reg. PD. Sprawdźmy to:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_por_P_1}
+	}
+	\caption{Porównanie reg. PD z reg. P}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_por_P_2}
+	}
+	\caption{Porównanie reg. PD z reg. P - zbliżenie na dojście do stanu ustalonego}
+\end{figure}
+
+Odpowiedzi nie różnią się dużo, ale możemy stwierdzić, że lepiej wygląda dla reg. PD - widać szybsze narastanie odpowiedzi i dojście do stanu ustalonego, ale także widać bardzo drobne oscylacje w stanie ustalonym. Jest zatem lepiej, ale jak na nakład pracy, by wybrać nastawy, oczekiwalibyśmy, że będzie lepiej.
+
+\subsubsection*{Sygnał sinusoidalny}
+
+Wymuszenie sinusoidalne o parametrach:
+
+\begin{itemize}
+\item[]Amplituda = $90 \degree$
+\item[]Częstotliwość = $0.05 \; \frac{rad}{s}$
+\end{itemize}
+
+Poczynając od nastaw wyznaczonych na początku:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/PD/zd9_PD_sin1}
+	}
+	\caption{Sygnał sinusoidalny, reg. PD: $k_r = 0.0737$, $T_D = 0.207$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_sin2}
+	}
+	\caption{Sygnał sinusoidalny, reg. PD: $k_r = 0.0737$, $T_D = 0.207$ - zbliżenie}
+\end{figure}
+
+Już na początku jest znacznie lepiej niż w przypadku początkowych nastaw dla reg. P - układ lepiej nadąża za wartością zadaną. Jak się jednak okaże wynika to wartości wzmocnienia $k_r$, a nie ma to wiele wspólnego z użytym różniczkowaniem.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_sin3}
+	}
+	\caption{Sygnał sinusoidalny, reg. PD: $k_r = 0.0737$, $T_D = 0$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_sin4}
+	}
+	\caption{Sygnał sinusoidalny, reg. PD: $k_r = 0.0737$, $T_D = 0$ - zbliżenie}
+\end{figure}
+
+Jak widać zupełnie usunęliśmy człon D, pozostawiając wzmocnienie bez zmian, a odpowiedź zupełnie nie uległa zmianie. Zmiane widać natomiast na wykresie sterowania, nie wariuje jak zwykle z członem D i przypomina teraz, bez zaskoczenia, te obserwowane na wykresach dla reg. P.
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_sin5}
+	}
+	\caption{Sygnał sinusoidalny, reg. PD: $k_r = 0.0737$, $T_D = 0.621$}
+\end{figure}
+
+Zwiększając $T_D$ tylko psujemy jakość. Nadążanie nie ulega poprawie, pojawiają się za to losowe wartości oraz przebieg sterowania jest znacznie gorszy - nie da się z niego nic odczytać.
+
+Niestety losowe zmiany spowodowane szumem są właściwie równe duże co te spowodowane wymuszeniem sinusoidalnym, zatem trudno nam będzie pogodzić ze sobą te rzeczy członem D.
+
+Powinniśmy zatem, tak jak w przypadku reg. P, zwiększać $k_r$, celem poprawy nadążania, ale pamiętając, że członem D, jeśli będzie miał niewielką wartość, nie zepsujemy go, zaś w przypadku odpowiedzi skokowej byliśmy w stanie poprawić sytuację.
+
+\newpage
+
+Ostatecznie decydujemy się na:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/PD/zd9_PD_sin6}
+	}
+	\caption{Sygnał sinusoidalny, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+\end{figure}
+
+Co do testowania innych wartości częstotliwości wymuszenia wnioski są podobne jak w przypadku reg. P. Dla mniejszych częstotliwości nadążanie wciąż będzie dobre, dla większych, od pewnej wartości częst., zdolność układu do nadążania zacznie się pogarszać - amplituda zacznie się różnić od amp. wymuszenia, najpierw rosnąc, w rejonie częst. rezonansowej, a następnie malejąc, a także zaczniemy obserwować przesunięcie fazowe. Czyli po prostu zacznie być gorzej.
+
+Sprawdzając nasze przypuszczenia:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 1.05 \linewidth]{zd9/PD/zd9_PD_sin9}
+	}
+	\caption{Sygnał sinusoidalny: $\omega = 0.01 \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_sin8}
+	}
+	\caption{Sygnał sinusoidalny: $\omega = 0.5 \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_sin7}
+	}
+	\caption{Sygnał sinusoidalny: $\omega = 1 \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+\end{figure}
+
+\newpage
+
+\subsubsection*{Chirp signal}
+
+\renewcommand{\w}{0.75}
+
+Stosując nastawy wyznaczone w podpunkcie wyżej, czyli dla dobrego nadążania, otrzymujemy:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp1}
+	}
+	\caption{Chirp signal: $0.01 \; \frac{rad}{s} \rightarrow 0.1 \; \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+	\label{fig:pd_chirp_k_start}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp2}
+	}
+	\caption{Chirp signal: $0.1 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+	\label{fig:pd_chirp3}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp3}
+	}
+	\caption{Chirp signal: $1 \; \frac{rad}{s} \rightarrow 10 \; \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+\end{figure}
+
+\newpage
+
+A następnie wykreślając ch-kę Bodego, dla transmitancji aproksymującej w układzie zamkniętym z regulatorem, otrzymujemy:
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = 0.85 \linewidth]{zd9/PD/zd9_PD_bode1}
+	}
+	\caption{Charakterystyka Bodego, reg. PD: $k_r = 0.184$, $T_D = 0.207$}
+	\label{fig:pd_bode3}
+\end{figure}
+
+I rzeczywiście jest to mniej więcej to, co możemy odczytać z testów chirp signalem. W porównaniu do reg. P, pik rezonansowy jest znacznie mniejszy, co także widać na wykresach czasowych i tak jak w przypadku reg. P, ze względu na ograniczenia rzeczywiste elementów, wartość częst. rezonansowej nie pokrywa się ze spodziewaną po odczytaniu wykresów czasowych. To co natomiast mocno rózni, patrząc z perspektywy ch-ki Bodego, reg. P z PD jest faza dla częstotliwości rosnącej do nieskończoności. W przypadku P było to $\varphi = -180\degree$, a teraz widzimy $\varphi = -90\degree$. Weryfikowanie jednak czy te wartości pokrywają się z rzeczywistością nie jest wykonalne - dla tych wyższych częstotliwości, szumy pomiarowe właściwie przewyższają stopniowo ginącą amplitudę i nie da się już nic porównywać. Do tego dochodzi jeszcze użyty w symulacji krok czasowy (\texttt{h = 0.01}), który dla wyższych częstotliwości, nie pozwoli nam na sensowne odczyty.
+
+Do weryfikacji jak wykresy czasowe dla wymuszenia chirp signalem oraz ch-ki Bodego będą zależeć od nastaw regulatora przeprowadzamy następujące testy:
+
+\renewcommand{\w}{0.855}
+ 
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp4}
+	}
+	\caption{Chirp signal: $0.09 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. PD: $k_r = 0.553$, $T_D = 0.207$}
+	\label{fig:pd_chirp2}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_bode_kr_5575}
+	}
+	\caption{Charakterystyka Bodego, reg. PD: $k_r = 0.553$, $T_D = 0.207$}
+	\label{fig:pd_bode2}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp5}
+	}
+	\caption{Chirp signal: $0.09 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. PD: $k_r = 0.0921$, $T_D = 0.207$}
+	\label{fig:pd_chirp1}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_bode_kr_921}
+	}
+	\caption{Charakterystyka Bodego, reg. PD: $k_r = 0.0921$, $T_D = 0.207$}
+	\label{fig:pd_chirp_k_end}
+	\label{fig:pd_bode1}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp6}
+	}
+	\caption{Chirp signal: $0.09 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0$}
+	\label{fig:pd_chirp_td_start}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_bode_td_0}
+	}
+	\caption{Charakterystyka Bodego, reg. PD: $k_r = 0.184$, $T_D = 0$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp8}
+	}
+	\caption{Chirp signal: $0.09 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.0311$}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_bode_td_310}
+	}
+	\caption{Charakterystyka Bodego, reg. PD: $k_r = 0.184$, $T_D = 0.0311$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_chirp7}
+	}
+	\caption{Chirp signal: $0.09 \; \frac{rad}{s} \rightarrow 1 \; \frac{rad}{s}$, reg. PD: $k_r = 0.184$, $T_D = 0.414$}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+	\includegraphics[width = \w \linewidth]{zd9/PD/zd9_PD_bode_td_414}
+	}
+	\caption{Charakterystyka Bodego, reg. PD: $k_r = 0.184$, $T_D = 0.414$}
+	\label{fig:pd_chirp_td_end}
+\end{figure}
+
+\newpage
+
+\begin{itemize}
+\item[-] Na rysunkach od \ref{fig:pd_chirp_k_start} do \ref{fig:pd_chirp_k_end} widzimy zmiany wykresów czasowych oraz ch-k Bodego dla zmian wzmocnienia przy stałym czasie różniczkowania. Z tych dwóch źródeł informacji widzimy, że zwiększając wzmocnienie, zwiększamy pewną ,,częstotliwość graniczną'' dla której układ dobrze radzi sobie z nadążaniem, ale kosztem większego wzmocnienia amplitudy dla częst. rezonansowej. Oczywiście pamiętamy o różnicach wynikających z wykreślania ch-k Bodego dla trans. aproksymującej i przez to nie uwzględniania ograniczeń układu, ale ważne jest, że widać ten trend.
+\begin{itemize}
+\item[-] Dla najmniejszego z trzech wzmocnień (rys. \ref{fig:pd_chirp1}, \ref{fig:pd_bode1}), $\omega_{rez} \approx 0.4 \frac{rad}{s}$, czyli najmniej, ale wzmocnienie amplitudy dla niej jest także najmniejsze, bo ledwo $> 1$.
+\item[-] Dla największego z trzech $k_r$ (rys. \ref{fig:pd_chirp2}, \ref{fig:pd_bode2}),  $\omega_{rez} \approx 2 \frac{rad}{s}$, czyli najwięcej, ale wzmocnienie amplitudy dla niej jest także największe, bo $\approx 1.3$.
+\item[-] Dla wzmocnienia ,,po środku'' (rys. \ref{fig:pd_chirp3}, \ref{fig:pd_bode3}), te zależności, są także ,,po środku''.
+\item[-] Na ch-ce fazowej widzimy podobne zmiany. 
+\end{itemize}
+
+\item[-] Zmieniając $T_D$, przy stałym wzmocenieniu (rys. od \ref{fig:pd_chirp_td_start} do \ref{fig:pd_chirp_td_end}), także widzimy podobne zmiany na ch-ce amplitudowej, ale także inny wpływ, w porównaniu do wzmocnienia, na ch-kę fazową. Zwiększając $T_D$, zmniejszamy częst. rezonansową, wraz ze wzmocnieniem dla niej, ale także zmniejszamy opóźnienie fazowe w rejonie częstotliwości od rezonansowej do dążącej do $\infty$.
+\end{itemize}
+
+\newpage
+
+\setcounter{section}{10}
+\setcounter{figure}{0}
+\section*{Zadanie nr 10 - PID Tuner}
+\addcontentsline{toc}{section}{Zadanie nr 10 - PID Tuner}
+
+Po długiej i ciężkiej walce z wyborem nastaw regulatorów, gdzie korzystaliśmy z naszej wiedzy o automatyce i testowaliśmy różne warianty wymuszeń, przechodzimy do drugiego, innego, sposobu na dobór nastaw - tym razem to komputer wybierze je za nas.
+
+Będziemy korzystać z aplikacji \texttt{PID Tuner} w środowisku MATLABa, która pozwala nam dobrać nastawy regulatora, przez podanie danych regulowanego obiektu, a następnie parametryzowanie pożądanej odpowiedzi według uznania. Jest to bardzo wygodny pomysł, bo nie sterujemy teraz, tak jak w poprzednim zadaniu, \textit{przyczyną}, czyli wartościami nastaw regulatora, ale \textit{skutkiem}, czyli tym jak chcemy, by odpowiedź faktycznie wyglądała. Zresztą te dwa sposoby na dobieranie nastaw regulatora można porównać do idei stosowania regulatora w układzie regulacji. Regulator stosujemy dlatego, bo chcemy podać wartość zadaną, czyli \textit{skutek}, którą chcemy zobaczyć na wyjściu, a nie chcemy zastanawiać się jakim wymuszeniem, czyli \textit{przyczyną} to osiągniemy. Jak widać ta sama idea stoi za tymi dwoma wynalazkami.
+
+Z \texttt{PID Tuner} najlepiej jest korzystać tak by sam wykrył badany obiekt w pętli regulacji i następnie dla, właśnie naszego obiektu, doradzał czego jak użyć. Niestety w niektórych przypadkach, jak właśnie u nas, modele z jakiegoś powodu nie są poprawnie wykrywane przez Tuner. Być może nasz model jest zbyt skomplikowany i przez to nie może zostać poprawnie przetworzony. Musimy zatem posługiwać się transmitancją aproksymującą. Rozwiązanie to ma pewne wady, które niebawem zostaną łatwo dostrzeżone.
+
+\subsubsection*{Regulator P}
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 0.8 \linewidth]{zd10/zd10_img1}
+	}
+	\caption{Okno \texttt{PID Tuner} - Dobór nastaw reg. P}
+\end{figure}
+
+W oknie mamy, w przypadku reg. P, jeden suwak do zmiany odpowiedzi. Zmieniając jego wartość otrzymujemy inne nastawy regulatora.
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 1 \linewidth]{zd10/zd10_P_1}
+	}
+	\caption{Set point = $120 \degree$, reg. P, $k_r$ = 0.0357}
+\end{figure}
+
+Jak widać pomimo stosowania przybliżonego modelu obiektu udało nam się uzyskać taką samą odpowiedź co w oknie wyżej. Spróbujmy teraz znaleźć drugie nastawy, bardziej agresywne.
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 1 \linewidth]{zd10/zd10_P_2}
+	}
+	\caption{Set point = $120 \degree$, reg. P: $k_r$ = 0.0602}
+\end{figure}
+
+Niestety w przypadku \texttt{PID Tuner}a nie możemy użyć wymuszenia sinusoidalnego, tak jak poprzednio, by postarać się znaleźć jak najlepsze nadążanie. Technologia cały czas się rozwija.
+
+\newpage
+
+\subsubsection*{Regulator PD}
+
+Jak dobrze wiemy regulatorem PD możemy osiągnąć więcej niż P, bo mamy dwa wzmocnienia do parametryzacji.
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 0.8 \linewidth]{zd10/zd10_img2}
+	}
+	\caption{Okno \texttt{PID Tuner} - Dobór nastaw reg. PD}
+\end{figure}
+
+Jak widać na oknie mamy teraz drugi suwak do dyspozycji i możemy dużo lepiej układać odpowiedź według uznania.
+Jest jednak problem.
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 1 \linewidth]{zd10/zd10_PD_1}
+	}
+	\caption{Set point = $120 \degree$, reg. PD: $k_r$ = 0.0288, $T_D$ = 0.544}
+\end{figure}
+
+Na obu rysunkach mamy te same nastawy reg. PD, ale odpowiedzi nie są do siebie zbyt podobne. Obiekt rzeczywisty odpowiada dużo wolniej, niż jego przybliżenie. Odpowiedź jest też mniej stabilna ze względu na szumy.
+
+\texttt{PID Tuner} nie bierze pod uwagę, ani rzeczywistych ograniczeń badanego obiektu, a łatwo zauważyć, że stosując człon D, sterowanie cały czas osiąga górną i dolną granicę zakresu, ani szumów, które są wzmacnianie przez różniczkowanie. Zastosowanie tej aplikacji w przypadku reg. PD, nie mogąc pracować na rzeczywistym modelu, będzie pewnym utrudnieniem.
+
+\newpage
+
+Ostatecznie jednak, udaje nam się wybrać dwie pary nastaw.
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 1 \linewidth]{zd10/zd10_PD_2}
+	}
+	\caption{Set point = $120 \degree$, reg. PD: $k_r$ = 0.0694, $T_D$ = 0.367}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 1 \linewidth]{zd10/zd10_PD_3}
+	}
+	\caption{Set point = $120 \degree$, reg. PD: $k_r$ = 0.0938, $T_D$ = 0.240}
+\end{figure}
+
+\newpage
+
+\setcounter{section}{11}
+\setcounter{figure}{0}
+\section*{Zadanie nr 11 - Ostateczne rowiązanie kwestii regulatorów}
+\addcontentsline{toc}{section}{Zadanie nr 11 - Ostateczne rowiązanie kwestii regulatorów}
+
+W dwóch poprzednich zadaniach staraliśmy się wybrać nastawy regulatorów mając na uwadze różne cechy odpowiedzi. W ten sposób nagromadziliśmy pewien zbiór tych wartości, ale w układzie regulator jest jeden i ma jedne nastawy. Musimy zatem zdecydować się, jakie liczby w końcu znajdą się w układzie.
+
+\begin{table}[h!]
+	\center
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		\multirow{2}{*}{\textbf{Sposób doboru}} & \textbf{P} & \multicolumn{2}{c|}{\textbf{PD}}\\
+		\cline{2-4}
+		& $k_r$ & $k_r$ & $T_D$\\
+		\hline
+		Syg. prostokątny & 0.0356 & 0.0590 & 0.455\\
+		Syg. sinusoidalny & 0.168 & 0.184 & 0.207\\
+		\texttt{PID Tuner}, nr 1& 0.0357 & 0.0694 & 0.367\\
+		\texttt{PID Tuner}, nr 2& 0.0602 & 0.0938 & 0.240\\
+		\hline
+	\end{tabular}
+	\caption{Wszystkie wyznaczone wartości nastaw}
+\end{table}
+
+Do umieszczenia w tabeli nie zdecydowaliśmy się na nastawy wyznaczane wstępnie w zadaniu nr 6. Powodów takiego zachowania można było się spodziewać, po wypisywanych wcześniej wnioskach. Wartości wyznaczane z wzorów na optymalne nastawy, raczej nigdy nie dadzą nam faktycznie optymalnych nastaw w obiekcie rzeczywistym. Wzory te będą spełniały swój cel w prostych, symulowanych, obiektach opisywanych w prosty sposób przez transmitancję, w rzeczywistym świecie, jednak nie opiszemy wszystkiego za pomocą jednej transmitancji, obiekt będzie zachowywał się trochę inaczej niż jego prosta aproksymacja. Zatem głównym zadaniem, które jest spełniane przez wzory na nastawy, jest to, by nam dać na starcie dobre, działające nastawy, a następnie my musimy je trochę dostosować do rzeczywistego świata. Właśnie w ten sposób zachowaliśmy się podczas projektu.
+
+Każde nastawy były dobierane z trochę innych powodów:
+
+\begin{itemize}
+\item[-] Dla sygnału prostokątnego chodziło nam o to, by usunąć przeregulowanie, a jednocześnie uzyskać jak najlepszy czas narastania.
+\item[-] Używając wymuszenia sinusoidalnego zależało nam na ty, by nadążanie było jak nalepsze.
+\item[-] Pierwsze nastawy wyznaczana przy pomocy \texttt{PID Tuner}a miały tak sam cel na uwadze co wyznaczane wcześniej dla sygnału prostokątnego, ale tym razem mogliśmy to zrobić lepiej i łatwiej.
+\item[-] Drugie nastawy wyznaczane przy pomocy \texttt{PID Tuner}a dobieraliśmy chcąc uzyskać lepszy czas narastania niż dla pierwszych, czyli chcieliśmy poprawić nadążanie wiedząc, że będzie nas to trochę kosztowało, tzn. głównie chodzi o przeregulowanie.
+\end{itemize}
+
+By pomóc sobie w ostatecznym doborze, możemy zdecydować się na wyliczenie wskaźników jakości regulacji bazujących na odpowiedzi skokowej. W ten sposób poza subiektywną oceną przebiegów czasowych do głosu mogą dojść obiektywne oceny.
+
+Wykorzystanymi przez nas wskaźnikami będą:
+
+\begin{description}
+\item[Maksymalne przeregulowanie] $y_p^{\%}$ = $\left( \frac{\Delta y_{max}}{\Delta y_{ust}} - 1 \right) \cdot 100 \%$
+\item[Czas opóźnienia] $t_o$ - jest to czas po którym wartość sygnału odpowiedzi układu y(t) osiąga 50\% wartości
+zmiany wyjścia układu z początkowego w końcowy stan ustalony $\Delta y_{ust}$
+\item[Czas narastania] $t_n$ - jest to czas potrzebny do wzrostu wartość sygnału odpowiedzi układu y(t) od 10\%
+do 90\% swojej zmiany wartości z początkowej w końcową $\Delta y_{ust}$
+\item[Czas regulacji] $t_r$ - jest to czas po którym wartość odpowiedzi skokowej układu y(t) pozostaje w pewnej
+określonej strefie dokładności $\pm$ p\% zmiany stanu ustalonego\footnote{Przyjmiemy p = 1\%}
+\end{description}
+
+Teraz wykreślimy odpowiedzi skokowe dla wszystkich nastaw regulatorów kandydujących do miana ostatecznych, a następnie wykorzystamy je do obliczenia wartości wspomnianych wskaźników.
+
+\begin{table}[h!]
+	\center
+	\begin{tabular}{V{4}c|c|cV{4}c|c|c|cV{4}}
+		\Xhline{2 pt}
+			\multirow{2}{*}{\textbf{Reg.}} & 
+			\multirow{2}{*}{$k_r$ $[\frac{V}{\degree}]$} & 
+			\multirow{2}{*}{$T_D$ $[s]$} & 
+			\multirow{2}{*}{$y_p^{\%}$ $[\%]$} & 
+			\multirow{2}{*}{$t_o$ $[s]$} & 
+			\multirow{2}{*}{$t_n$ $[s]$} & 
+			\multirow{2}{*}{$t_r$ $[s]$}\\
+		&&&&&&\\
+		\Xhline{2 pt}
+		\multirow{4}{*}{\textbf{P}} & 0.0356 & - & 0.667 & 2.56 & 4.35 & 7.30\\
+		& 0.168 & - &15.3 & 1.83 & 2.05 & 10.0\\
+		& 0.0357 & - & 1.0 & 2.56  & 4.35& 7.25\\
+		& 0.0602 & - & 7.33 & 1.88 & 2.56 & 8.30\\
+		\Xhline{2pt}
+		\multirow{4}{*}{\textbf{PD}} & 0.0590 & 0.455 & 0.333 & 2.26 & 3.76 & 6.05\\
+		& 0.184 & 0.207 & 8.67 & 1.83 & 2.18 & 9.00\\
+		& 0.0694 & 0.367 & 2.00 & 2.08 & 3.18 & 7.50\\
+		& 0.0938 & 0.240 & 6.00 & 1.88 & 2.48 & 7.20\\
+		\Xhline{2 pt}
+	\end{tabular}
+	\caption{Wskaźniki jakości regulacji}
+\end{table}
+
+Obiektywne wskaźniki jakości mówią nam to samo co wywnioskowaliśmy z obserwacji przebiegów. W przypadku reg. P zwiększając wzmocnienie zwiększa się przeregulowanie ($y_p^{\%}$), ale maleje czas opóźnienia ($t_o$) i czas narastania ($t_n$). Czas regulacji ($t_r$) jednak jak widać rośnie, bo przeregulowania wprowadzane przez większe wzmocnienia dopiero później ustają.
+
+W przypadku reg. PD użyte wskaźniki pozwoliły nam pokazać, że rzeczywiście zastosowanie reg. PD pozwala nam poprawić jakość bardziej niż sam reg. P. Oczywiście nie wątpiliśmy w to, ale patrząc na same odpowiedzi czasowe, widać było bardzo drobne różnice, na korzyść PD, pomiędzy regulatorami. Wskaźniki pozowliły nam jednak, bardziej stanowczo utwierdzić nas w przekonaniu, że PD jest lepszy.
+
+Z tabeli też łatwo widać, w jaki sposób wpłynie zmiana nastaw PD. Reg. PD pozwala nam na dobranie większego wzmocnienia niż samym P, a następnie dobranie małego czasu $T_D$, pozwoli nam poprawić tę odpowiedź. Widać to dobrze porównując pierwsze nastawy dla obu regulatorów. PD ma większe wzmocnienie ($k_r$ = 0.0590), niż P ($k_r$ = 0.0356), ale mimo to użyty czas różniczkowania ($T_D$ = 0.455), pozwolił nam uzyskać lepsze wskaźniki niż reg. P.
+
+Biorąc pod uwagę wartości uzyskane w tabeli oraz ocenę subiektywną, ostatecznie możemy się zdecydować na drugie nastawy wyznaczane przez \texttt{PID Tuner}, bo mieliśmy tam na uwadze i jak najmniejsze przeregulowanie i dobre nadążanie, czyli zależało nam na kompromisie nastaw wyznaczanych przy pomocy wymuszeń prostokątnych i sinusoidalnych. Ostatecznie:
+
+\begin{itemize}
+\item[P]: $k_r = 0.0602$ $\frac{V}{\degree}$
+\item[PD]: $k_r = 0.0938$ $\frac{V}{\degree}$, $T_D = 0.240 \; s$
+\end{itemize}
+
+\newpage
+
+Teraz porównamy odpowiedzi skokowe układu dla obu regulatorów i wybierzemy jeden.
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = 1.1 \linewidth]{zd11/zd11_img1}
+	}
+	\caption{Set point = $120 \degree$, porównanie regulatorów}
+\end{figure}
+
+Różnice są niewielkie, ale jako zwycięzce możemy uznać reg. PD. Jak można było się domyślić reg. P jest uboższą wersją PD i mając reg. PD możemy zawsze osiągnąć to samo co reg. P, zerując wpływ członu D. Niestety ze względu na występujące szumy oraz ograniczenia sterowania, które były cały czas osiągane przy zastosowaniu członu D, nie jesteśmy w stanie osiągnąć całego potencjału reg. PD. Z tego powodu, żeby poprawić jakość odpowiedzi członem D, musieliśmy go ustawiać na bardzo małe wartości - w ten sposób, odpowiedź była tylko trochę poprawiana względem otrzymywanych z użyciem reg. P. By lepiej wykorzystać możliwości płynące z członu D, można by się zastanowić na dodaniem jakiegoś filtru, który redukował by szumy. Korzystając z samego regulatora mogliśmy uzyskać tylko nie wielkie poprawy.
+
+Pomimo tego, że wskazaliśmy PD jako faworyta, to trzeba by się zastanowić, czy rzeczywiście warto inwestować w dodatkowy człon, którym co prawda poprawimy jakość, ale w bardzo niewielkim stopniu. Dodatkowo jeszcze reg. PD, ma tendecje do agresywnych reakcji w odpowiedzi na szumy i odpowiedź w stanie ustalonym może czasem ,,skakać'' ze stanu ustalonego.
+
+Gdyby to zatem od nas zależało jaki regulator wybrać to byłby to reg. P, którym już znacząco poprawiamy jakość regulacji, jednocześnie będąc prostszym w obsłudze.
+
+\newpage
+
+\setcounter{section}{12}
+\setcounter{figure}{0}
+\section*{Zadanie nr 12 - Dyskretny regulator}
+\addcontentsline{toc}{section}{Zadanie nr 12 - Dyskretny regulator}
+
+Mamy już dostrojony regulator i gotowy układ regulacji. Teraz zaimplementujemy algorytm PID korzystając z S-funkcji\footnote{Do realizacji tego zadania korzystamy z reg. PD, ze względu na to, że jest bardziej skomplikowany niż reg. P i możemy przez to wyrzeźbić trochę dłuższy kod.}.
+
+Przez całe laboratorium do symulacji korzystaliśmy z Simulinka. Jest to bardzo proste w obsłudze środowisko, stworzone specjalnie do testowania układów regulacji. Jeśli jednak zdecydujemy się na poprawę, a nie samą symulację, obiektu znajdującego się w prawdziwym świecie, to będziemy raczej korzystali z innych bardziej uniwersalnych narzędzi jak np. język C. W takim środowisku nie korzystamy z łatwych obsłudze bloczków, które łączymy kabelkami, tylko musimy znać faktycznie jak te bloczki działają. Regulator PID możemy opisać za pomocą równań różnicowych stosując:
+
+\begin{itemize}
+\item[-] Algorytm przyrostowy:
+\begin{equation*}
+u_i = u_{i-1} + k_r \left[ \left( e_i - e_{i-1} \right) + \frac{h}{T_I}e_i + \frac{T_D}{h} \left(e_i - 2e_{i-1} + e_{i-2} \right) \right]
+\end{equation*}
+
+\item[-] Algorytm pozycyjny:
+\begin{equation*}
+u_i = k_r \left[ e_i + \frac{h}{T_I} \sum^i_{n = 0}e_n + \frac{T_D}{h} \left( e_i - e_{i-1} \right) \right]
+\end{equation*}
+\end{itemize}
+
+Komputery stosunkowo dobrze rozumieją dyskretny zapis oraz takie operacje arytmetyczne jak różnice, zatem takie algorytmy można zaimplementować właściwie w każdym języku programowania.
+
+\begin{figure}[h!]
+	\centerline{
+		\fbox{\includegraphics[width = 1.0 \linewidth]{zd12/zd12_img1}}
+	}
+	\caption{Układ regulacji z s-funkcją}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+		\fbox{\includegraphics[width = 0.8 \linewidth]{zd12/zd12_img3}}
+	}
+	\caption{Konfiguracja s-funkcji - zapamiętywanie poprzednich wartości}
+\end{figure}
+
+\begin{figure}[h!]
+	\centerline{
+		\fbox{\includegraphics[width = 0.9 \linewidth]{zd12/zd12_img2}}
+	}
+	\caption{Konfiguracja s-funkcji - algorytm regulacji}
+\end{figure}
+
+Oczywiście w trakcie symulacji tylko jeden algorytm jest aktywny, a drugi wykomentowany.
+
+Oba algorytmy będą działały w ten sam sposób. Dowód:
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = \linewidth]{zd12/zd12_sim1}
+	}
+	\caption{Porównanie algorytmów}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h!]
+	\centerline{
+		\includegraphics[width = \linewidth]{zd12/zd12_sim2}
+	}
+	\caption{Porównanie algorytmów - zbliżenie}
+\end{figure}
+
+W każdej chwili czasu każda z wartość wyjścia wymusza to samo, co drugi algorytm, sterowanie w następnej chwili. By zauważyć, zmiany na wykresie jedna z liń musiała zostać pogrubiona.
+
+Mamy zatem do dyspozycji dwa proste algorytmy, które możemy zastosować w prawdopodobnie każdym środowisku. Można zauważyć, że samo serce, idea regulacji PID, nie jest skomplikowana, ale, by móc poprawnie z niego korzystać bez względu na warunki, tzn. dostępny sprzęt, musimy zejść trochę ,,niżej'', w porównaniu do obsługi Simulinka przez bloki.
+
+\newpage
+
+\section*{Podsumowanie}
+\addcontentsline{toc}{section}{Podsumowanie}
+
+W zajęciach projektowych naszym celem, zgodnie z nazwą przedmiotu, było stworzenie dedykowanego układu sterowania dla rzeczywistego obiektu - w naszym przypadku chodziło o sterowanie pozycją wału silnika prądu stałego.
+Do zrealizowania całego projektu należało wykonać szereg różnych czynności poczynając od poprawnej identyfikacji obiektu, a kończąć na doborze optymalnych nastaw regulatora i jego dyskretnej realizacji. Chodziło zatem o wykorzystanie całej, zdobytej jak na razie, naszej wiedzy o automatyce, którą dotychczas testowaliśmy na całkowicie wirtualnych procesach opisywanych przez kilka transmitancji lub równań różniczkowych, do zrobienia czegoś w rzeczywistym świecie, gdzie prosty opis matematyczny nie jest możliwy, a jedynie decydujemy się na model uwzględniający pewne cechy, zazwyczaj te najważniejsze, procesu. Łatwymi do zauważenia różnicami pomiędzy, jak na razie testowanymi przez nas, wirtualnymi obiektami, a rzeczywistymi, były szumy pomiarowe oraz, ograniczenia zakresu sygnałów. Tego typu różnice pokazały, że projekt idealnego układu sterowania, nie sprowadzi się do podstawienia kilku liczb do wzorów i otrzymania gotowego układu, ale trzeba poświęcić na to więcej pracy. Oczywiście wspomniane wzory są cały czas wykorzystywane, zdobyta wiedza cały czas ma sens, ale chodzi o to, że bez odpowiedniego ,,dokręcenia'' parametrów projektu raczej nie uzyskamy tego na czym nam należy.
+
+
+\end{document}

@@ -1,0 +1,481 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage{polski}
+\usepackage{geometry}
+	\geometry{margin = 2.5cm}
+\usepackage{indentfirst}
+\usepackage{xcolor}
+\usepackage{bold-extra}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{graphicx}
+\usepackage[unicode, colorlinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage[shortlabels]{enumitem}
+	\setlist[itemize]{--, itemsep = 0cm}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage[labelfont = bf]{caption}
+
+\linespread{1.3}
+
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+
+\lstdefinestyle{mystyle}{%
+	backgroundcolor = \color{backcolour},
+%	basicstyle = \ttfamily \small,
+ 	basicstyle = \ttfamily \footnotesize,
+	commentstyle = \color{green!50!black},
+	numberstyle = \tiny \color{codegray},
+	stringstyle = \color{codepurple},
+	keywordstyle = \color{blue!85!black},
+	breakatwhitespace = false,
+	breaklines = true,
+	captionpos = b,
+	keepspaces = true,
+	showspaces = false,
+	showstringspaces = false,
+	showtabs = false,
+	tabsize = 4,
+	numbers = left,
+	numberstyle = \tiny \color{black},
+	morecomment = [l]{\%},
+	frame = single
+}
+
+\lstset{
+	style = mystyle,
+%	language = MATLAB,
+	morekeywords = {byte},
+	literate = %
+		{ą}{{\k{a}}}1
+		{Ą}{{\k{A}}}1
+		{ć}{{\'c}}1
+		{Ć}{{\'{C}}}1
+		{ę}{{\k{e}}}1
+		{Ę}{{\k{E}}}1
+		{ł}{{\l{}}}1
+		{Ł}{{\L{}}}1
+		{ń}{{\'n}}1
+		{Ń}{{\'N}}1
+		{ó}{{\'o}}1
+		{Ó}{{\'O}}1
+		{ś}{{\'s}}1
+		{Ś}{{\'S}}1
+		{ż}{{\.z}}1
+		{Ż}{{\.Z}}1
+		{ź}{{\'z}}1
+		{Ź}{{\'Z}}1
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{IP -- lab. nr 9}
+\rhead{Kaźmieruk, Skibiński}
+\cfoot{\thepage}
+
+\graphicspath{
+	{./img/}
+}
+
+
+
+
+%%%
+%%%		DOKUMENT
+%%%
+
+\begin{document}
+
+
+
+%%%
+%%%		TITLEPAGE
+%%%
+
+\begin{titlepage}
+{\LARGE
+\begin{center}
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width = 0.2\linewidth]{C:/good_folder/nauka/inne/polsl_logo_v2}
+	\end{figure}
+	
+	\vspace{0.25cm}
+	
+	\textbf{\textsc{Politechnika Śląska}}
+	
+	\textbf{\textsc{Wydział Automatyki, Elektroniki i Informatyki}}
+	
+	\vspace{1.5cm}
+	
+	Laboratorium Identyfikacji Procesów
+	
+	\vspace{1.5cm}
+	
+	Ćw. nr 9:
+	
+	Dynamiczne modele nieliniowe Hammersteina-Wienera
+	
+	\vspace{0.5cm}
+	
+	{\Large Sprawozdanie}
+\end{center}
+}
+
+\vfill
+
+{\Large
+\noindent
+\textbf{Data laboratorium:} 03.12.2021 r.
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{AiR S2-I/Rob}\\
+% \textbf{Sekcja nr 1}:
+\textbf{Sekcja 2, podsekcja 1 (\underline{niepełna})}:
+
+\noindent
+\hspace*{0.5cm} Paweł Kaźmieruk\\
+\hspace*{0.5cm} Maksymilian Skibiński\\
+
+% rok 2020/2021, sem. letni, gr. Rob, sekcja nr 1
+
+\vspace{0.5cm}
+}
+
+\begin{center}
+\phantom{\today{} r.}
+\end{center}
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\newpage
+
+
+
+\section{Wstęp}
+
+Celem zajęć laboratoryjnych była identyfikacja obiektu korzystając z dynamicznych modeli nieliniowych Hammersteina-Wienera. Ich ogólna struktura jest widoczna na rysunku~\ref{fig:modele}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.7 \linewidth]{ip9_model}
+	\caption{Model Hammersteina-Wienera}
+	\label{fig:modele}
+\end{figure}
+
+Model ten zakłada:
+\begin{itemize}
+\item pewną nieliniowość wejściową, oznaczoną jako funkcja $f_H(u)$,
+\item część liniową opisaną w postaci transmitancji dyskretnej $H(z^{-1})$,
+\item pewną nieliniowość wyjściową, oznaczoną jako funkcja $f_W(x)$.
+\end{itemize}
+
+Taki model pozwala nam lepiej opisać pewien dynamiczny obiekt, niż za pomocą samej transmitancji. Jeśli, któraś z nieliniowości nie jest wykorzystana (można przyjąć, że ta funkcja równa jest 1) to modele dzielimy na:
+\begin{itemize}
+\item modele Hammersteina -- wykorzystujemy nieliniowość wejściową ($f_H(u)$),
+\item modele Wienera -- wykorzystujemy nieliniowość wyjściową ($f_W(x)$).
+\end{itemize}
+
+\section{Ćwiczenie}
+
+Na podstawie otrzymanych pomiarów wejścia ($u$) i wyjścia ($y$) identyfikujemy parametry wybranego modelu. Jako nieliniowości rozważamy jedynie nieliniowość w postaci wielomianu, natomiast na jego stopień nie nakładamy żadnych ograniczeń. Jako część liniową rozważamy model Output Error:
+\[
+	H(z^{-1}) = z^{-nk} \frac{B(z^{-1})}{F(z^{-1})}
+\]
+
+Identyfikację możemy rozpocząć od wyznaczenia korelacji wzajemnej pomiędzy sygnałami $u$ i $y$ -- w ten sposób możemy wyznaczyć opóźnienie $nk$ występujące w modelu części liniowej. Jest ona widoczna na rysunku~\ref{fig:korelacja}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.5 \linewidth]{kor}
+	\caption{Korelacja wzajemna $u$ i $y$}
+	\label{fig:korelacja}
+\end{figure}
+
+Przesunięcie $\tau$ dla którego wartość funkcji korelacji gwałtownie wzrasta jest równe opóźnieniu, które występuje w modelu. Z wykresu wynika, że $nk = 1$.
+
+\subsection*{Część liniowa}
+
+Przejdźmy do identyfikacji części liniowej. Będziemy zmieniać stopnie wielomianów $B(z^{-1})$ i $F(z^{-1})$ i badać ich wpływ na poprawność modeli. Przy analizie pomocne będą:
+\begin{itemize}
+\item Test skracania zer i biegunów -- jeśli któreś bieguny i zera leżą ,,blisko'' siebie może to oznaczać, że stopnie wielomianów są zbyt duże i należy zubożyć strukturę.
+\item Test białości błędu predykcji -- funkcja autokorelacja białego szumu po znormalizowaniu dla przesunięcia 0 wynosi 1, a dla pozostałych 0 i taką funkcję autokorelacji powinien mieć błąd predykcji. Jeśli tak nie jest świadczy to o tym, że model jest zbyt ubogi i nie potrafi opisać wszystkich zależności występujących w danych pomiarowych. Oczywiście, w rzeczywistości funkcja ta dla przesunięć różnych od 0 nie będzie równa dokładnie 0, ale będzie zawierała się w pewnym małym zakresie wartości.
+\item Analiza wartości występujących w wielomianach -- chodzi przede wszystkim o wartości bardzo bliskie 0, co może świadczyć o tym, że któryś z wielomianów ma zbyt wysoki stopień.
+\item Współczynnik dopasowania o postaci:
+\[
+	100 \cdot \left( 1 - \frac{||y - \hat{y}||}{||y - \text{mean}(y)||} \right)
+\]
+gdzie przez $y$ oznaczamy dane pomiarowe wyjścia, a przez $\hat{y}$ wyjście modelu dla tych samych wejść.
+\end{itemize}
+
+W tabelach~\ref{tbl:lin} i~\ref{tbl:lin2} zapisaliśmy wspomniane wartości.
+
+\newcommand{\tak}{\color{green!75!black} tak}
+\newcommand{\nie}{\color{red!75!black} nie}
+
+\paragraph{Uwaga:} w tabeli {\tak} przy testach oznacza, że model test przeszedł (szum jest biały lub żadne bieguny i zera się nie skracają), a {\nie}, że model testu nie przeszedł.
+
+\begin{table}[p!]
+	\centering
+	\begin{tabular}{c|c||c|c|c}
+		$dB$ & $dF$ & 
+			test skr. & test biał. & dopasowanie \\
+		\hline\hline
+		1 & 1 &
+			\tak & \nie & 36\% \\
+		\hline
+		1 & 2 &
+			\tak & \nie & 83.28\% \\
+		\hline
+		2 & 1 &
+			\tak & \nie & 46.98\% \\
+		\hline
+		2 & 2 &
+			\tak & \nie & 83.28\% \\
+		\hline
+		3 & 2 &
+			\tak & \nie & 83.28\% \\
+		\hline
+		2 & 3 &
+			\nie & \nie & 83.28\% \\
+		\hline
+		3 & 3 &
+			\nie & \nie & 83.28\% \\
+		\hline
+		4 & 4 &
+			\nie & \nie & 83.28\% \\
+		\hline
+		5 & 5 &
+			\nie & \nie & 83.29\%
+	\end{tabular}
+	\caption{Wpływ zmian stopni wielomianów na poprawność modeli (przy stałym opóźnieniu)}
+	\label{tbl:lin}
+\end{table}
+
+\begin{table}[p!]
+	\centering
+	\begin{tabular}{c|c||l}
+		$dB$ & $dF$ & wielomiany \\
+		\hline\hline
+		\multirow{2}{*}{1} & \multirow{2}{*}{1} &
+			$B(z^{-1}) = 0.340 z^{-1}$ \\
+		&& $F(z^{-1}) = 1 - 0.606 z^{-1}$ \\
+		\hline
+		\multirow{2}{*}{1} & \multirow{2}{*}{2} &
+			$B(z^{-1}) = 0.252 z^{-1}$ \\
+		&& $F(z^{-1}) = 1 - 1.30 z^{-1} + 0.702 z^{-2}$ \\
+		\hline
+		\multirow{2}{*}{2} & \multirow{2}{*}{1} &
+			$B(z^{-1}) = 0.253 z^{-1} + 0.252 z^{-2}$ \\
+		&& $F(z^{-1}) = 1 - 0.427 z^{-1}$ \\
+		\hline
+		\multirow{2}{*}{2} & \multirow{2}{*}{2} &
+			$B(z^{-1}) = 0.253 z^{-1} - 0.00174 z^{-2}$ \\
+		&& $F(z^{-1}) = 1 - 1.30 z^{-1} + 0.703 z^{-2}$ \\
+		\hline
+		\multirow{2}{*}{3} & \multirow{2}{*}{2} &
+			$B(z^{-1}) = 0.253 z^{-1} - 0.00221 z^{-2} + 0.000631 z^{-3}$ \\
+		&& $F(z^{-1}) = 1 - 1.30 z^{-1} + 0.703 z^{-2}$ \\
+		\hline
+		\multirow{2}{*}{2} & \multirow{2}{*}{3} &
+			$B(z^{-1}) = 0.253 z^{-1} + 0.0170 z^{-2}$ \\
+		&& $F(z^{-1}) = 1 - 1.23 z^{-1} + 0.605 z^{-2} + 0.0525 z^{-3}$ \\
+		\hline
+		\multirow{2}{*}{3} & \multirow{2}{*}{3} &
+			$B(z^{-1}) = 0.253 z^{-1} + 0.184 z^{-2} - 0.00195 z^{-3}$ \\
+		&& $F(z^{-1}) = 1 - 0.570 z^{-1} - 0.252 z^{-2} + 0.515 z^{-3}$ \\
+		\hline
+		\multirow{2}{*}{4} & \multirow{2}{*}{4} &
+			$B(z^{-1}) = 0.253 z^{-1} + 0.0135 z^{-2} - 0.0478 z^{-3} + 0.00300 z^{-4}$ \\
+		&& $F(z^{-1}) = 1 - 1.24 z^{-1} + 0.444 z^{-2} + 0.280 z^{-3} - 0.129 z^{-4}$ \\
+		\hline
+		\multirow{2}{*}{5} & \multirow{2}{*}{5} &
+			$B(z^{-1}) = 0.253 z^{-1} + 0.291 z^{-2} - 0.0527 z^{-3} - 0.107 z^{-4} + 0.00336  z^{-5}$ \\
+		&& $F(z^{-1}) = 1 - 0.148 z^{-1} - 0.997  z^{-2} + 0.638  z^{-3} + 0.424  z^{-4} - 0.303 z^{-5}$ \\
+	\end{tabular}
+	\caption{Współczynniki wielomianów $B(z^{-1})$ i $F(z^{-1})$}
+	\label{tbl:lin2}
+\end{table}
+
+\newpage
+
+\subsubsection*{Wnioski}
+
+\begin{itemize}
+\item Żaden z modeli nie przeszedł nie przeszedł testu białości szumu, co świadczy o tym, że sama część liniowa nie jest w stanie poprawnie opisać zależności występujących w danych pomiarowych.
+\item Dosyć szybko, bo już dla stopni $dB = 1$ i $dF = 2$ otrzymany został model, którego wartość wskaźnika dopasowania jest maksymalna spośród otrzymanych. Stopnie możemy zwiększać dalej, ale model i tak lepiej dopasowany już nie będzie. Gdyby używać wskaźników informacyjnych AIC czy BIC, wspomniany model uzyskałby najmniejszą wartość, zatem taką która nas najbardziej satysfakcjonuje. To, że dopasowanie czasem wzrosło o 0.01\% nie ma znaczenia.
+\item Poza tym, że dopasowanie się już nie poprawia przy zwiększaniu wzbogacaniu struktury modelu, to dodatkowo modele zaczynają nie przechodzić test skracania zer i biegunów, zatem są nadmiernie skomplikowane.
+\end{itemize}
+
+A co jeśli dobrane przez nas opóźnienie jest niepoprawne?
+
+Jeśli wybierzemy mniejsze opóźnienie, czyli w naszym wypadku może być tylko 0, to zobaczymy, że pierwszy współczynnik wielomianu $B(z^{-1})$ ma wartość bliską zeru. Przykładowo dla stopni $nB = 2$, $nF = 3$ przy opóźnieniu $nk = 0$, otrzymujemy:
+\begin{align*}
+B(z^{-1}) &= \ -0.00257 + 0.256 z^{-1} + 0.0146 z^{-2} \\
+F(z^{-1}) &= \ 1 - 1.23 z^{-1} + 0.610 z^{-2} + 0.0502 z^{-3}
+\end{align*}
+
+Jak łatwo można zauważyć wyraz wolny wielomianu $B$ jest znacznie mniejszy od pozostałych współczynników tego wielomianu, zatem algorytm szukający rozwiązania dążył w kierunku wartości zerowej tego współczynnika -- zatem uzyskane zostało wcześniej wykorzystywane opóźnienie równe 1.\\
+
+A co jeśli wykorzystamy większe opóźnienie? Wtedy będzie troszkę ,,ciekawiej''.
+
+Generalnie, otrzymane modele będą znacznie gorzej dopasowane do danych pomiarowych, bo współczynnik dopasowania przyjmuje dla takich modeli wartości w okolicach 50\%, zatem znacznie gorzej niż poprzednio. Jest jednak pewne ale -- te modele już prawie przechodzą test białości błędu predykcji, co można zobaczyć na rysunku~\ref{fig:bialy}.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[opóźnienie $nk = 1$]{%
+		\includegraphics[width = 0.45 \linewidth]{b5_f5_k1_img2}%
+	}%
+	\hfill%
+	\subfloat[opóźnienie $nk = 2$]{%
+		\includegraphics[width = 0.45 \linewidth]{b6_f5_d2_img1}%
+	}%
+	\caption{Test białości szumu -- różne opóźnienie}
+	\label{fig:bialy}
+\end{figure}
+
+Modele te różnią się opóźnieniem i poza tym -- by być precyzyjnym -- lekko stopniem wielomianów, ale nie ma to w tym momencie większego znaczenia, bo dalsze zwiększanie wspomnianych stopniów nie wpływa na funkcję autokorelacji błędu. Chcemy tylko zauważyć, że większe opóźnienie ,,wybiela'' błąd, bo jedynie dla jednego przesunięcia (poza tym równym 0) wartości funkcji autokorelacji wychodzą poza próg%
+\footnote{Tak naprawdę to sytuacja ta występuje dla dwóch przesunięć, ale f. autokorelacji jest symetryczna, więc nie ma to większego znaczenia}
+, choć model jest rzekomo gorzej dopasowany ze względu na wartość współczynnika dopasowania.
+
+Dodajmy jeszcze, że jeśli będziemy korzystać z większych opóźnień, dopasowanie będzie coraz gorsze, a dla f. autokorelacji błędu predykcji, coraz więcej wartości będzie wychodzić poza ustalone ograniczenia.
+
+Jeszcze do tego powrócimy, na razie przejdźmy do nieliniowości.
+
+\subsection*{Nieliniowość wejściowa -- model Hammersteina}
+
+Do dalszych testów korzystać będziemy głównie z tego modelu, który wykazał najlepsze dopasowanie, a jednocześnie miał jak najmniejszą liczbę parametrów. Opis testów w sposób krótki widać w tabeli~\ref{tbl:hammer}.
+\begin{table}[htbp!]
+	\centering
+	\begin{tabular}{c||c}
+		stopień & dopasowanie\\
+		\hline\hline
+		1 & 83.28\% \\
+		\hline
+		2 & 83.33\% \\
+		\hline
+		3 & 83.72\% \\
+		\hline
+		4 & 83.72\% \\
+		\hline
+		10 & 83.88\%
+	\end{tabular}
+	\caption{Dopasowanie ze względu na zmieniający się stopień wielomianu na wejściu}
+	\label{tbl:hammer}
+\end{table}
+
+Ogólnie rzecz biorać, nasze testy nie wykazały by na wejściu modelu znajdowała się jakaś nieliniowość, a jeśli mimo wszystko jest, to ma ona mały wpływ na obiekt. Jak widać w tabeli dopasowanie wzrasta ze wzrostem stopnia wielomianu wejściowego, ale wzrost ten jest bardzo mały -- można pokusić się o stwierdzenie, że model zamiast ,,generalizować'' zjawisko zbyt bardzo dopasowuje się do szumu, czego nie chcemy.
+
+Zmiany struktury modelu liniowego na tym etapie także nie pozwoliły nam otrzymać niczego lepszego. Nieliniowość wejściowa nie wpłyneła także w łatwo zauważalny na choćby test białości szumu. Nie zamieszczamy także wartości współczynników wielomianu, bo biorąc pod uwagę wnioski, nie ma sensu dłużej ich analizować.
+
+\subsection*{Nieliniowość wyjściowa -- model Wienera}
+
+Przeprowadźmy podobne testy dla nieliniowości wyjściowej.
+\begin{table}[htbp!]
+	\centering
+	\begin{tabular}{c||c}
+		stopień & dopasowanie\\
+		\hline\hline
+		1 & 83.28\% \\
+		\hline
+		2 & 83.32\% \\
+		\hline
+		3 & 99.87\% \\
+		\hline
+		4 & 99.87\% \\
+		\hline
+		5 & 99.87\% \\
+		\hline
+		10 & 99.87\%
+	\end{tabular}
+	\caption{Dopasowanie ze względu na zmieniający się stopień wielomianu na wyjściu}
+	\label{tbl:wiener}
+\end{table}
+
+Tym razem zdołaliśmy otrzymać coś co może nas cieszyć -- zwiększając stopień wielomianu wyjściowego udało się znacznie zwiększyć wartość wskaźnika dopasowania. Spójrzmy jeszcze na wartości współczynników wielomianu.
+\begin{table}[htbp!]
+	\centering
+	\begin{tabular}{c||r}
+		stopień & wielomian $f_W(x)$ \\
+		\hline\hline
+		1 & $0.253 x - 4.87 \cdot 10^{-4} $ \\
+		\hline
+		2 & $-9.21 \cdot 10^{-4} x^2 + 0.253 x - 4.87 \cdot 10^{-4} $ \\
+		\hline
+		3 & $0.0036x^3 -1.05 \cdot 10^{-6} x^2 + 0.200 x - 5.76 \cdot 10^{-7} $ \\
+		\hline
+		4 & $6.07 \cdot 10^{-8}x^4 + 0.0036x^3 -1.05 \cdot 10^{-6} x^2 + 0.200 x - 5.76 \cdot 10^{-7} $ \\
+		\hline
+		5 & $1.38 \cdot 10^{-8}x^5 + 8.34 \cdot 10^{-8}x^4 + 0.0036x^3 -3.26 \cdot 10^{-6} x^2 + 0.200 x + 4.31 \cdot 10^{-6} $ \\
+		\hline
+	\end{tabular}
+	\caption{Współczynniki wielomianu wyjściowego}
+	\label{tbl:wiener2}
+\end{table}
+
+Pomińmy już wielomian stopnia 10, bo dalsze zwiększenie nie ma już znaczenia, a poza tym zaczyna brakować miejsca... W każdym razie, wnioski są następujące: kluczowe są współczynniki przy zmiennych $x$ i $x^3$, bo ich wartości raczej się nie zmieniają ze wzrostem stopnia, a także są znacznie większe od pozostałych wartości.
+
+Sprawdziliśmy także co można otrzymać jeśli zdecydujemy się także zmienić strukturę modelu liniowego. Testy wykazały, że lepiej się już nie da -- dopasowanie 99.87\% to de facto dopasowanie stuprocentowe, a za tę nieznaczną część dzielącą nas od faktycznych 100\% musi już odpowiadać szum, którym przecież zawsze obarczone są pomiary.
+
+Jednak pomimo tak dobrego dopasowania model wciąż nie przechodzi testu białości błędu predykcji. Jeśli natomiast zwiększymy opóźnienie do $nk = 2$, to model w końcu przejdzie test białości szumu... ale dopasowanie spadnie do około 50\%. Funkcje autokorelacji widoczne są na rysunku~\ref{fig:bialy2}.
+\begin{figure}[htbp!]
+	\centering
+	\subfloat[opóźnienie $nk = 1$]{%
+		\includegraphics[width = 0.45 \linewidth]{wiener_1}%
+	}%
+	\hfill%
+	\subfloat[opóźnienie $nk = 2$]{%
+		\includegraphics[width = 0.45 \linewidth]{b2_f2_d2_out3}%
+	}%
+	\caption{Test białości szumu -- różne opóźnienie (model Wienera)}
+	\label{fig:bialy2}
+\end{figure}
+
+Ten fragment mocno nas dziwi i jest dla nas cały czas nierozwiązaną tajemnicą. Świetnie dopasowany model, nie spełnia testu białości błędu predykcji, co powinno świadczyć o tym, że jest on niekompletny i nie opisuje wystarczająco dobrze identyfikowanego obiektu, ale gdy zwiększymy opóźnienie, i model przejdzie test białości szumu to jest on znacznie gorzej dopasowany. Zgodnie z sugestiami prowadzącego zajęcia staraliśmy się znaleźć rozwiązanie tej zagadki w dokumentacji Matlaba dla wykorzystywanych funkcji (\texttt{compare}, \texttt{pem} czy \texttt{idnlhw}), ale ostatecznie się to nam nie udało.
+
+Być może nieliniowości wcale nie są wielomianami, być może model liniowy jest innego typu, być może algorytm nie zdołał znaleźć wystarczająco dobrych wartości parametrów. Nie wiemy.
+
+Z funkcji korelacji sygnałów wejściowego $u$ i wyjściowego $y$ (rys.~\ref{fig:korelacja}) uzyskanych w trakcie pomiarów wynika jednak, że opóźnienie \emph{powinno} wynosić $nk = 1$.
+
+\subsection*{Model Hammersteina-Wienera}
+
+Staraliśmy także zidentyfikować bardziej skomplikowany model, który zawierał nieliniowości na wejściu i wyjściu, ale nie udało się uzyskać jeszcze lepszego dopasowania. Poza tym pojawiły się pewne problemy.
+
+Załóżmy, że chcemy poprawić to co otrzymaliśmy poprzednio, ten model Wienera, który uzyskiwał dopasowanie prawie stuprocentowe. Dokładamy nieliniowość na wejście i teoretycznie, dopasowanie nie powinno spaść, bo jeśli jej tam nie ma to algorytm powinien po prostu przy współczynnikach wielomianu wejściowego ustawić wartości tak bliskie zeru (poza wyrazem wolnym) jak tylko możliwe. Niestety tak nie jest, algorytm grzęźnie w jakiś minimach lokalnych i dla takich modeli nie tylko nie poprawiamy dopasowania, ale jest jeszcze gorzej.
+
+Jednak biorąc pod uwagę wnioski z podpunktów poświęconych modelom Hammersteina i Wienera osobno, możemy stwierdzić, że nieliniowości na wejściu raczej nie ma, a jeśli jest to nie ma ona większego wpływu.
+
+\section{Podsumowanie}
+
+Najlepszy pod względem dopasowania i liczbą parametrów jest model Wienera o następującej strukturze:
+\begin{itemize}
+\item część liniowa $H(z^{-1})$:
+\[
+	H(z^{-1}) = \frac{B(z^{-1})}{F(z^{-1})} =
+		\frac{0.252}{1 - 1.30 z^{-1} + 0.702 z^{-2}} \ z^{-1}
+\]
+\item nieliniowość wyjściowa $f_W(x)$:
+\[
+	f_W(x) = 0.0036x^3 -1.05 \cdot 10^{-6} x^2 + 0.200 x - 5.76 \cdot 10^{-7}
+\]
+\end{itemize}
+
+Porównanie wyjścia modelu z danymi pomiarowymi można zobaczyć na rysunku~\ref{fig:compare}.
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width = 0.6 \linewidth]{wiener_2}
+	\caption{Porównanie wyjścia modelu z danymi pomiarowymi}
+	\label{fig:compare}
+\end{figure}
+
+Jedynym punktem, który pozostaje dla nas niezrozumiały to wyniki testu białości błędu predykcji, które wychodzą nie takie jakbyśmy się tego spodziewali. Tutaj nasz głód wiedzy nie został zaspokojony.
+
+
+
+\end{document}

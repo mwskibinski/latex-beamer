@@ -1,0 +1,921 @@
+\documentclass[11pt]{article}
+
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+\usepackage[unicode]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\geometry{a4paper, left = 2.5cm, right = 2.5cm, top = 2.5cm, bottom = 2.5cm}
+\usepackage{indentfirst}
+\usepackage[dvipsnames, table]{xcolor}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage{multirow}
+\usepackage{tikz}
+	\usetikzlibrary{shapes, arrows, positioning}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{pgfplots}
+\usepackage{listings}
+\usepackage{colortbl}
+\usepackage[shortlabels]{enumitem}
+\usepackage[title]{appendix}
+
+% \captionsetup[subfigure]{labelformat = empty}
+
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+
+\definecolor{tableGray}{rgb}{0.9, 0.9, 0.9}
+
+\renewcommand{\arraystretch}{1.2}
+
+\lstdefinestyle{mystyle}{%
+	backgroundcolor = \color{backcolour},
+% 	basicstyle = \ttfamily \small,
+ 	basicstyle = \ttfamily \footnotesize,
+	commentstyle = \color{red!90},
+	numberstyle = \tiny \color{codegray},
+	stringstyle = \color{codepurple},
+	breakatwhitespace = false,
+	breaklines = true,
+	captionpos = b,
+	keepspaces = true,
+	showspaces = false,
+	showstringspaces = false,
+	showtabs = false,
+	tabsize = 4,
+	numbers = left,
+	numberstyle = \tiny \color{black},
+	morecomment = [l]{\%},
+	frame = single
+}
+
+\lstset{%
+	style = mystyle,%
+	literate = %
+		{ą}{{\k{a}}}1
+		{Ą}{{\k{A}}}1
+		{ć}{{\'c}}1
+		{Ć}{{\'{C}}}1
+		{ę}{{\k{e}}}1
+		{Ę}{{\k{E}}}1
+		{ł}{{\l{}}}1
+		{Ł}{{\L{}}}1
+		{ń}{{\'n}}1
+		{Ń}{{\'N}}1
+		{ó}{{\'o}}1
+		{Ó}{{\'O}}1
+		{ś}{{\'s}}1
+		{Ś}{{\'S}}1
+		{ż}{{\.z}}1
+		{Ż}{{\.Z}}1
+		{ź}{{\'z}}1
+		{Ź}{{\'Z}}1
+}
+
+\pgfplotsset{compat = newest}
+\usepgfplotslibrary{units}
+
+\sisetup{
+	round-mode = places,
+	round-precision = 2
+}
+
+\linespread{1.1}
+
+\graphicspath{{./img2/}}
+
+\newcommand{\PlotWidth}{0.45}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{BOA - projekt}
+\rhead{Gruchalski, Kaźmieruk, Skibiński, Szczepanik}
+\cfoot{\thepage}
+
+\def\plotBool{1}
+
+\newenvironment{tikzFig}
+{%
+	\begin{figure}[h!]%
+		\centering%
+		\begin{tikzpicture}%
+}
+{%
+		\end{tikzpicture}%
+	\end{figure}%
+}
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+		\textbf{\LARGE Bezzałogowe Obiekty Autonomiczne\\%
+		\vspace{1cm}%
+		Synteza i symulacja reaktywnego systemu sterowania dla
+		wybranych struktur kinematycznych kołowego robota mobilnego%
+		}
+		
+		\vspace{0.75cm}
+		
+		\vspace{1.0cm}
+		
+		{\large \textbf{AiR S2-I/Rob}}
+		
+		\vspace{0.2cm}
+		
+		{\large \textbf{Sekcja 3}}
+		
+		\vspace{0.5cm}
+		
+		{\large
+		Piotr Gruchalski\\
+		Paweł Kaźmieruk\\
+		Maksymilian Skibiński\\
+		Mateusz Szczepanik%
+		}
+		
+		\vspace{0.2cm}
+
+		\vspace{2.0cm}
+		
+		\vfill
+		
+		\begin{figure}[h]
+			\centering
+			\includegraphics[trim = 0 20mm 0 0, clip, width = 0.2\linewidth]{polsl_logo}
+		\end{figure}
+		
+		
+		\vspace{0.5cm}
+		
+		Wydział Automatyki, Elektroniki i Informatyki\\
+		Politechnika Śląska\\
+		\today{} r.%
+	\end{center}
+\end{titlepage}
+
+\setcounter{page}{2}
+\section{Wstęp}
+
+Celem zajęć projektowych było zaprojektowanie reaktywnego systemu sterowania dla wybranego robota mobilnego. Taki system sterowania powinien zadbać o dotarcie robota do celu (lub możliwie blisko niego) oraz omijanie przeszkód. Praca ta została wykonana w środowisku MATLAB z użyciem toolboxa Mobile Robotics Simulation.
+
+\subsection{Teoria}
+
+Reaktywne systemy sterowania (zwane też behawioralnymi) charakteryzuje dosyć szybkie wyznaczanie zachowań robota w odpowiedzi na sygnały sensorów w zamian za świadomą rezygnację z możliwości otrzymania optymalnej trasy dojścia do celu. Taka transakcja ma sens, gdyż niezwykle trudno jest wykonać taki sekwencyjny system sterowania, który poradzi sobie ze sprawnym przetwarzaniem wszystkich danych dostępnych z sensorów robota, tak by wyznaczyć jak najlepszą trasę. Podejście behawioralne, proponuje wyposażenie robota w pewien nieduży zbiór zachowań i ich koordynację, które pozwolą mu \emph{dobrze} radzić sobie w pewnym środowisku.
+
+Przy projektowaniu takiego systemu należy wykonać dwa zadania:
+\begin{enumerate}
+\item Wyposażyć robota w pewien zbiór zachowań;
+\item Skoordynować je ze sobą.
+\end{enumerate}
+
+Zbiór zachowań jest, ogólnie, zbiorem funkcji, które przetwarzają sygnały pochodzące z sensorów robota, w akcje. Teoretycznie, czym więcej zachowań, tym robot staje się bardziej inteligentny i może poradzić sobie w większej liczbie sytuacji. Większą ilość zachowań jest jednak trudniej ze sobą skoordynować oraz wiąże się z większym nakładem obliczeniowym, dlatego powinno się celować w mniejszy zbiór, który potrafi bardziej ogólnie, a mniej szczegółowo, opisywać zachowanie robota w pewnym wybranym środowisku.
+
+Kolejną częścia systemu jest układ koordynacji, który decyduje jak ostatecznie zachowa się robot. Pewne sygnały generują sprzeczne ze sobą akcje, pewne oddziałują na siebie w jakimś stopniu, a inne nie wpływają na siebie w ogóle. Zadaniem koordynacji jest pogodzić ze sobą wszystkie zachowania, i wyznaczyć ostateczne sterowanie w danej chwili czasu. Taki cel można osiągnąć korzystając np. z metod priorytetowych, które służą do oznaczenia zachowań ważniejszych i tym samym wykonywanych w danej chwili, bądź można skorzystać z fuzji zachować, wyznaczając tym samym pewne wypadkowe sterowanie.
+
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture}[
+		font = \ttfamily, > = stealth,
+		zachStyle/.style = {rectangle, fill = orange!25, draw = orange!25!black, font = \scriptsize\ttfamily}
+		]
+		% \draw[help lines, dashed] (-5, 0) grid (7, 4);
+		
+		\node[ellipse, fill = green!25, draw = green!25!black, minimum size = 1.25cm]
+			(Otoczenie) at (0.75, -0.5) {Otoczenie};
+		\node[rectangle, fill = orange!25, draw = orange!25!black, rotate = 90]
+			(Sensory) at (-4, 2) {Sensory};
+		\node[rectangle, fill = orange!25, draw = orange!25!black, minimum size = 1.5cm]
+			(Koordynacja) at (2.5, 2) {Koordynacja};
+		\node[rectangle, fill = orange!25, draw = orange!25!black, align = center, rotate = 90]
+			(EW) at (5.5, 2) {Elementy\\Wykonawcze};
+			
+		\node[zachStyle] (Zachowanie1) at (-1, 2.75)
+			{Zachowanie nr 1};
+		\node[zachStyle] (Zachowanie2) at (-1, 2.25)
+			{Zachowanie nr 2};
+		\node[zachStyle, opacity = 0] (Zachowanie3) at (-1, 1.75)
+			{Zachowanie nr 3};
+		\node[zachStyle] (ZachowanieN) at (-1, 1.25)
+			{Zachowanie nr N};
+			
+		\draw[->] (Otoczenie.west) -- +(-4.25, 0) |- (Sensory.north);
+		
+		\draw[->] ([yshift = 1.5mm] Sensory.south) -- (Zachowanie1.west);
+		\draw[->] ([yshift = 0.5mm] Sensory.south) -- (Zachowanie2.west);
+		\draw[->, opacity = 0.2, dashed] ([yshift = -0.5mm] Sensory.south) -- (Zachowanie3.west);
+		\draw[->] ([yshift = -1.5mm] Sensory.south) -- (ZachowanieN.west);
+		
+		\draw[->] (Zachowanie1.east) -- ([yshift = 1.5mm] Koordynacja.west);
+		\draw[->] (Zachowanie2.east) -- ([yshift = 0.5mm] Koordynacja.west);
+		\draw[->, opacity = 0.2, dashed] (Zachowanie3.east) -- ([yshift = -0.5mm] Koordynacja.west);
+		\draw[->] (ZachowanieN.east) -- ([yshift = -1.5mm] Koordynacja.west);
+		
+		\draw[->] (Koordynacja.east) -- (EW.north);
+		\draw[->] (EW.south) -- +(0.45, 0) |- (Otoczenie.east);
+		
+		\draw[dashed, orange!50!black] (-4.5, 0.5) rectangle (6.25, 3.75);
+		\node[text = orange!50!black] (Robot) at (0.75, 4) {Robot};
+		
+		\fill[black] (-1, 1.9) circle (0.75pt);
+		\fill[black] (-1, 1.75) circle (0.75pt);
+		\fill[black] (-1, 1.6) circle (0.75pt);
+	\end{tikzpicture}
+	\caption{Uproszczona struktura systemu behawioralnego}
+\end{figure}
+
+\newpage
+
+\subsection{Środowisko}
+
+Wykorzystany toolbox MATLABa oferuje kilka różnych struktur kinematycznych robotów mobilnych w postaci gotowych funkcji, służących do symulacji dynamiki robotów. W pracy skorzystano z mobilnego robota z napędem różnicowym.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width = 0.4 \linewidth]{robot}
+	\caption{Model kinematyczny robota z napędem różnicowym}
+\end{figure}
+
+Robota opisują 3 dostępne funkcje:
+\begin{itemize}[--]
+\item \texttt{DifferentialDrive(R, L)} -- powołuje do życia naszą maszynę. Jest ona opisana przez dwa parametry: promień kół ($R$) oraz odległość pomiędzy ich środkami ($L$).
+\item \texttt{forwardKinematics(vehicle, wL, wR)} -- rozwiązanie prostego zadania kinematyki. Znając prędkości kątowe obu kół ($\omega_L$, $\omega_R$), otrzymujemy prędkość liniową robota ($v$) oraz jego prędkość kątową ($\omega$).
+\item \texttt{inverseKinematics(vehicle, v, w)} -- rozwiązanie odwrotnego zadania kinematyki. Wiąże wspomniane wyżej wielkości w odwrotnej kolejności.
+\end{itemize}
+
+Ostatnie dwie funkcje po prostu rozwiązują zapisane niżej równania:
+
+\begin{minipage}{0.5\textwidth}
+	\vspace{0.5cm}
+	\texttt{forwardKinematics}
+	\begin{equation*}
+	v = \frac{R}{2} \left( \omega_R + \omega_L \right)
+	\end{equation*}
+	\begin{equation*}
+	\omega = \frac{R}{L} \left( \omega_R - \omega_L \right)
+	\end{equation*}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+	\vspace{0.5cm}
+	\texttt{inverseKinematics}
+	\begin{equation*}
+	\omega_L = \frac{1}{R} \left( v - \frac{\omega L}{2} \right)
+	\end{equation*}
+	\begin{equation*}
+	\omega_R = \frac{1}{R} \left( v + \frac{\omega L}{2} \right)
+	\end{equation*}
+\end{minipage}
+
+Wielkości:
+\begin{itemize}[--]
+\item $R$, $L$ są zapisane w metrach [m],
+\item $\omega_R$, $\omega_L$, $\omega$ w radianch na sekundę [$\frac{\text{rad}}{\text{s}}$],
+\item $v$ w metrach na sekundę [$\frac{\text{m}}{\text{s}}$].
+\end{itemize}
+
+Robot wyposażony został w lidar, służący do wykrywania przeszkód. Składa się nań 10 równomiernie rozmieszczonych wiązek z zakresu kątów od $-\frac{\pi}{2}$ do $\frac{\pi}{2}$.
+
+\vspace{0.5cm}
+
+Wszystkie przedstawione w tym podpunkcie informacje można łatwo znaleźć w dokumentacji toolboxa (\href{https://www.mathworks.com/matlabcentral/fileexchange/66586-mobile-robotics-simulation-toolbox}{link}).
+
+\newpage
+
+\section{System sterowania}
+
+Zgodnie z ideą sterowania behawioralnego, system dzieli się na zbiór zachowań oraz ich koordynację. W tym rozdziale zostanie omówiony ogólny sposób działania naszego systemu oraz przedstawione zostaną fragmenty kodu odpowiedzialne za omawiane funkcje. Cały kod został umieszczony na \hyperref[sec:kod]{końcu raportu}.
+
+\subsection{Ogólna koncepcja}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[trim = {2.5cm 8.75cm 2cm 2.9cm}, clip, width = \linewidth]{nasz_system}
+	\caption{Struktura naszego systemu sterowania}
+\end{figure}
+
+Na rysunku powyżej przedstawiony został schemat blokowy ilustrujący przepływ sygnałów z sensorów i ich wpływ na wynikowe sterowanie -- na system składa się zbiór pięciu zachowań i trzech funkcji koordynujących, a w końcowej fazie wykorzystywana jest funkcja rozwiązująca odwrotne zadanie kinematyki (\texttt{inverseKinematics}), dająca wynikowe prędkości kątowe dla obu kół robota.
+
+Na układ sensoryczny robota składa się lidar dostarczający informacji o odległości robota od przeszkód, oraz bliżej niezidentyfikowany sensor, dostarczający informacji o położeniu celu, robota i, w ten sposób, o różnicy pomiędzy ich pozycjami. Sygnały te trafiają do zbioru zachowań (a także, jeden z nich do modułu koordynacji), i służą do obliczeń odpowiednich sygnałów sterujących.
+
+Za najistotniejsze dla działania naszego system sterowania można uznać dwa zachowania i~dwie funkcje koordynujące:
+\begin{itemize}[--]
+\item \emph{Omijanie przeszkód}, \emph{Docieranie do celu} -- dla z. zachowań,
+\item \emph{$\Sigma$}, \emph{f. sigmoidalna} -- dla koordynacji.
+\end{itemize}
+
+\emph{Omijanie przeszkód} oblicza prędkości kątowe dla obu kół, takie by ominąć wykryte przez lidar przeszkody, a \emph{Docieranie do celu} oblicza p. kątową robota, ze względu na różnicę kątową pomiędzy orientacją robota, a celem, sprowadzającą tę różnicę do zera. Sygnały wynikowe zachowania \emph{Omijanie przeszkód}, są koordynowane przy pomocy ich superpozycji, a następnie ten sygnał, wraz z sygnałem wyjściowym zachowania \emph{Docieranie do celu}, są koordynowane przy pomocy funkcji sigmoidalnej. Ta funkcja ma dwa parametry, ale jeden z nich jest ważniejszy -- jest to odległość od przeszkody. Czym bliżej robot jest przeszkody, tym mocniejsze znaczenie ma sterowanie obliczone przez zachowanie omijające przeszkody, a mniejsze to pozwalające dotrzeć do celu.
+
+Pozostałe zachowania/koordynacje, pozwalają lepiej przygotować robota do operowania w~środowisku:
+\begin{itemize}[--]
+\item \emph{Prędkość liniowa} jest jedyną funkcją regulującą pr. liniową robota. Ogólnie jest ona stała, ale czym bliżej robot znajduje się przeszkody, tym mocniej jest ona zmniejszana.
+\item \emph{Mechanizm antyzatrzymaniowy} generuje zakłóconą pr. kątową (ze względu na cel), pozwalającą w sytuacjach gdy robot trafia do kąta przeszkody, opuścić go. Taka sytuacja jest u nas wykrywana poprzez sprawdzenie czy prędkość liniowa robota jest bardzo mała. Gdy taki warunek jest prawdziwy funkcja koordynująca (\emph{if prędkość liniowa $<$ 0,01}) przepuszcza ten sygnał zakłócony -- jest to koordynacja na zasadzie priorytetowej.
+\item \emph{Zmiana kąta skrętu} oblicza parametr \texttt{radius} służący jako argument funkcji sigmoidalnych wykorzystywanych w dwóch miejscach (\emph{Omijanie przeszkód}, \emph{funkcja sigmoidalna}). Zachowanie to pozwala nam na zmianę wagi sterowania omijającego przeszkody, gdy robot znajduje się bliżej celu -- w ten sposób robot potrafi dotrzeć do celu przy przeszkodzie.
+\end{itemize}
+
+W następnych punktach te funkcje zostaną omówione szerzej (wraz z ich kodami).
+
+\subsection{Zachowania}
+
+\subsubsection*{Omijanie przeszkód}
+
+Robot wykrywa przeszkody przy pomocy lidara, który omiata otoczenie dziesięcioma wiązkami w zakresie kątów od $-\frac{\pi}{2}$ do $\frac{\pi}{2}$. Wygenerowane sterowanie zależy od 2 parametrów:
+\begin{itemize}[--]
+\item pozycji wiązki lidara -- im bliżej kąta zerowego, tym mocniejsza reakcja. Pozwala to lepiej zabezpieczyć robota przed przeszkodami, z którymi zderzenie może nastąpić szybciej.
+\item odległości od przeszkody -- czym robot bliżej jest przeszkody, tym mocniej musi zmienić swoją prędkość kątową by ją ominąć.
+\end{itemize}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{sigmo}
+	\caption{Używana funkcja sigmoidalna}
+\end{figure}
+
+Do wypracowania odpowiedniego sygnału sterującego skorzystano z funkcji sigmoidalnej. Jak łatwo zauważyć, przeszkody, które znajdują się daleko ingerują słabiej w zmianę prędkości kątowej, natomiast te które są bardzo blisko -- już dużo mocniej. Wyjście samej funkcji jest bezwymiarowe - wymiar prędkości kątowej ($\frac{\text{rad}}{\text{s}}$) otrzymuje, gdy jest przemnożone przez wagę związaną z pozycją wiązki lidara.
+
+Po uwzględnieniu tych założeń stworzono następujący kod.
+\begin{lstlisting}[firstnumber = 73]
+    % Prędkości obu kół wynikające z przeszkód.
+    omega_obstacle_L = sum( ...
+        f_sigmoidalna(0.1, radius, ranges(1:5)) .* linspace(0.01, 0.1, 5)');
+    omega_obstacle_R = sum( ...
+        f_sigmoidalna(0.1, radius, ranges(6:10)) .* linspace(0.1, 0.01, 5)');
+\end{lstlisting}
+
+Zmienna \texttt{ranges} przechowuje informację o wykrytych odległościach od przeszkód. Wektor wag tworzony poprzez funkcję \texttt{linspace} służy do uwzględnienia z jaką siłą będą działały wiązki ,,centralne'', według omówionego wyżej pomysłu. 5 pierwszych wiązek działa z lewej strony, a ostatnie 5 z prawej -- wypracowane sterowania są ze sobą sumowane i w ten sposób otrzymujemy pożądaną, według danego zachowania, prędkość kątową robota.
+
+Pierwszy argument funkcji sigmoidalnej, odpowiadający za wygładzenie kształtu funkcji, ($0.1$) został dobrany eksperymentalnie. Podobnie jest z parametrem \texttt{radius}, który ogólnie wynosi 50, ale jego dokładna wartość jest powiązana z innym (omówionym później) zachowaniem.
+
+\subsubsection*{Docieranie do celu}
+
+Robot stara się minimalizować różnicę kątową pomiędzy swoją orientacją a celem. W zależności od wartości tej różnicy, liniowo zmienia swoją prędkość kątową.
+
+\begin{lstlisting}[firstnumber = 83]
+    % Kąt celu.
+    angle_goal = atan2(goal(2) - pose(2), goal(1) - pose(1));
+    
+    % Różnica kątowa wraz z rozwiązaniem problemu nieciągłości
+    % funkcji atan2.
+    angle_diff = atan2( ...
+        sin(angle_goal - pose(3)), ...
+        cos(angle_goal - pose(3)) ...
+    );
+
+    % Prędkość kątowa wynikająca z różnicy kątowej.
+    omega_goal = angle_diff * 0.1;
+\end{lstlisting}
+
+\subsubsection*{Prędkość liniowa}
+
+Robot stara się poruszać ze stałą prędkością liniową, ale gdy jest blisko przeszkody zmniejszą ją, by uniknąć zderzenia ze ścianą. To zachowanie nazwano ,,mechanizmem antykolizyjnym''.
+\begin{lstlisting}[firstnumber = 102]
+    % Mechanizm antykolizyjny.
+    % Zmiany prędkości liniowej w funkcji odległości od przeszkody.
+    % Zabezpiecza robota przed kolizją.
+    if min(ranges) < 20
+        predkosc_liniowa = (1/20 * min(ranges))^2;
+    else
+        predkosc_liniowa = 1;
+    end
+\end{lstlisting}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{p_liniowa_2}
+	\caption{Zależność prędkości liniowej od odległości od przeszkody}
+\end{figure}
+
+Kształt funkcji zmniejszającej prędkość liniową jak i sama odległość od celu, zostały dobrane doświadczalnie -- ostatecznie zdecydowaliśmy się realizować to przy pomocy f. kwadratowej.
+
+\subsubsection*{Zmiana kąta skrętu - parametr \texttt{radius}}
+
+W sytuacji gdy robot jest blisko celu zaczyna zmniejszać promień skrętu, by trafić weń nawet wówczas, gdy tuż obok celu jest przeszkoda.
+\begin{lstlisting}[firstnumber = 61]
+    % Dystans od celu.
+    dist = sqrt((pose(1) - goal(1))^2 + (pose(2) - goal(2))^2);
+        
+    % Jeśli odległość robota od celu jest mała,
+    % to zmieniamy kąt skretu - im bliżej tym ciaśniejszy.
+    if dist > 50
+        radius = 50;
+    else
+        radius = (1/sqrt(50) * dist).^2;
+    end
+\end{lstlisting}
+
+Parametr ten zmienia swoje wartości zgodnie z funkcją kwadratową. Zależność ta zaczyna jednak działać dopiero wówczas, gdy robot jest blisko celu -- w przeciwnym razie zbyt mocno zniekształcałaby sterowanie wypracowywane przy przeszkodach.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{radius}
+	\caption{Zależność parametru \texttt{radius} od odległości do celu}
+\end{figure}
+
+Działanie tego parametru może nie być zbyt intuicyjne. Jest on wykorzystywany w dwóch miejscach w naszym kodzie: przy wyznaczaniu prędkości kątowych wynikających z odległości od przeszkód, oraz przy wyznaczaniu współczynnika koordynacji, przy ostatecznym wyznaczaniu prędkości kątowej robota (co jest omówione później) -- jest on drugim argumentem funkcji sigmoidalnej, która jest w tych sytuacjach wykorzystywana.
+
+Na rysunku niżej, został przedstawiony wpływ zmian wartości tego parametru na kształt funkcji mapującej sygnał wpływający na pr. kątową w zależności od odległości od przeszkody. Zmniejszenie wartości tego parametru powoduje przesunięcie funkcji sigmoidalnej, co z kolei wpływa na zmniejszenie wpływu odległości od przeszkody na wypadkową prędkość kątową -- sygnały wynikające z rozmieszczenia przeszkód zostają osłabione, przez co różnica kątową względem celu, ma większy wpływ.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width = 0.5\linewidth]{radius_2}
+	\caption{Wpływ \texttt{radius}}
+\end{figure}
+
+\subsubsection*{Mechanizm antyzatrzymaniowy}
+
+Czasem zdarza się, że robot zatrzymuje się przy przeszkodzie, bo generowane sterowanania do tego go zmuszają. W tej sytuacji nieznacznie zniekształcamy zadaną prędkość kątową, by zmienić tor jego ruchu. To zachowanie nazwano "mechanizmem antyzatrzymaniowym".
+\begin{lstlisting}[firstnumber = 96]
+    % Mechanizm antyzatrzymaniowy.
+    if predkosc_liniowa < 0.01
+        omega_goal = (angle_diff - pi/2) * 0.1;
+    end
+\end{lstlisting}
+
+\newpage
+
+\subsection{Koordynacja}
+
+Układ koordynacji obsługuje zachowania ingerujące w prędkość kątową robota. Prędkość liniowa jest zmieniana poprzez jedną akcję, dlatego w jej wypadku moduł ten nie ma co czynić.
+
+\subsubsection*{Prędkość kątowa wynikająca z przeszkód}
+Dotyczy dwóch zachowań robota, które tak naprawdę stanowią jedność -- dwie prędkości kątowe, które zostają wyznaczone w zależności od odległości od wykrytych przeszkód. Prędkości te są ze sobą łączone na zasadzie superpozycji -- jedna jest odejmowana od drugiej.
+\begin{lstlisting}[firstnumber = 79]
+    % Koordynacja obu tych prędkości.
+    omega_obstacle = omega_obstacle_L - omega_obstacle_R;
+\end{lstlisting}
+
+\subsubsection*{Mechanizm antyzatrzymaniowy}
+
+Mechanizm antyzatrzymaniowy ma wyższy priorytet niż ogólna prędkość kątowa wypracowana poprzez różnicę kątową względem celu. W przypadku, gdy prędkość liniowa jest bardzo mała (czyli odległość od przeszkody jest bardzo mała) prędkość kątowa jest zniekształcana.
+\begin{lstlisting}[firstnumber = 96]
+    % Mechanizm antyzatrzymaniowy.
+    if predkosc_liniowa < 0.01
+        omega_goal = (angle_diff - pi/2) * 0.1;
+    end
+\end{lstlisting}
+
+\subsubsection*{,,Ogólna'' prędkość kątowa}
+
+W większości sytuacji robot musi jednocześnie zmieniać swoją prędkość kątową w zależności od odległości od przeszkody i różnicy kątowej względem celu. Te dwa zachowania są ze sobą powiązane na zasdzie fuzji -- czym bliżej robot jest przeszkody, tym ważniejsze jest sterowanie wygenerowane przez zasadę omijającą przeszkodę. Wykorzystano do tego wcześniej wspomnianą funkcję sigmoidalną.
+\begin{lstlisting}[firstnumber = 112]
+    % Współczynnik alfa, przyjmuje wartości z zakresu 0 do 1.
+    % Odpowiada za fuzję prędkości kątowych wyzacznonych od
+    % celu oraz przeszkód.
+    alfa = f_sigmoidalna(0.1, radius, min(ranges));
+    
+    % Prędkość kątowa ostateczna.
+    omega = alfa * omega_obstacle + (1 - alfa) * omega_goal;
+\end{lstlisting}
+
+\newpage
+
+\section{Testy}
+
+\subsection{Prosta mapa}
+
+Zaprojektowany system sterowania radzi sobie bardzo dobrze w sytuacjach nieskomplikowanych, tj. gdy przeszkód jest niewiele.
+
+\newcommand{\w}{0.24}
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test1}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test2}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test14}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test4}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test5}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test6}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test7}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test8}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test9}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test10}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test11}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test19}%
+	}%
+	
+	\caption{Przykłady prostych zadań}
+\end{figure}
+
+Na takiej mapie robot dobrze radzi sobie z płynną regulacją prędkością obrotową, tak by omijać przeszkody i docierać do celu. Wypracowane przez system sterowania trasy można nazwać całkiem intuicyjnymi (za wyjątek można by uznać przykład na rysunku (g)). Ponadto robot umie docierać do celu, który znajduje się zaraz przy przeszkodzie\footnote{Takie zadania dla robota były problematyczne wcześniej, na etapie poprzedniego szkicu naszego raportu -- jest on już nieaktualny.} (przykłady (k), (l)).
+
+\newpage
+
+\subsection{Dodanie kolejnych przeszkód}
+
+Poziom trudności mapy zwiększono, by sprawdzić działanie robota w bardziej złożonych sytuacjach. Trasa, którą obiera robot nie zawsze jest trasą najkrótszą, ale wynika to z jego ograniczonej wiedzy o otoczeniu.
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_1}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_2}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_3}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_4}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_5}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_6}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_20}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_8}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_9}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_10}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_17}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_a_19}%
+	}%
+	
+	\caption{Przykłady zadań o umiarkowanym poziomie trudności}
+\end{figure}
+
+Ogólnie robot radzi sobie cały czas dobrze z omijaniem przeszkód i docieraniem do celu, ale na takiej mapie zdarza mu się zachowywać w ,,dziwny'' sposób -- za przykłady mogą posłużyć zadania z rysunków (f), (g), (k) oraz (l).
+\begin{itemize}[--]
+\item w przypadku (f) oraz (g), pozycja początkowa robota, tj. koordynaty x, y oraz \emph{orientacja}, powodują, że robot podjeżdża do ściany, a dopiero później zmienia swoją orientację względem celu, w bardziej gwałtowny sposób. Najlepiej byłoby, gdyby zaczął od ,,naprawienia'' swojej orientacji, by podążać względem celu, w ten sposób zaooszczędziłby sobie swojej nadmiarowej, zupełnie niepotrzebnej drogi. Zaprojektowany przez nas system wymusza, by robot starał się podążąć ze stałą prędkością liniową, którą zmniejsza dopiero przy samych preszkodach, stąd taka trasa.
+\item podobny wpływ pozycji początkowej robota, na jego trasę do celu widać na rysunku (k). Gdyby orientacja początkowa, była równa ok. 0 rad, robot znacznie szybciej dotarłby do celu. Ten problem jednak dużo bardziej wynika z samej idei systemu behawioralnego, który stara się szybko wyznaczać następne sterowania, zamiast optymalnej trasy, niźli z naszych pomysłów (choć te też pewnie mogłyby być lepsze).
+\item na rysunku (l) widać, jak w pewnym momencie robot robi nadmiarowy obrót, przy skręcie. Wynika to po prostu z naszego sposobu koordynacji reguł wyznaczających prędkość kątową względem celu, oraz względem przeszkód. Koordynowane są na zasadzie superpozycji, z współczynnikiem, który zmienia swoją wartość w zależności od odległości od przeszkody. Znacznie lepiej byłoby, gdyby robot po prostu skręcił w lewo, zamiast wykonywać taki obrót, ale należołaby zastosować jakiś inny sposób koordynacji.
+\end{itemize}
+
+Niestety, na nowej mapie istnieje też przeszkoda, której robot nie potrafi pokonać.
+
+\begin{figure}[h!]
+	\centering
+	
+	\phantom{\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{img/test_b_8}%
+	}}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{img/test_b_8}%
+	}%
+	\hfill
+	\subfloat[zbliżenie]{%
+		\includegraphics[width = \w \linewidth]{img/test_b_8_zb}%
+	}%
+	\hfill
+	\phantom{\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{img/test_b_4}%
+	}}%
+	
+	\caption{Robot wpada w pułapkę}
+\end{figure}
+
+System nie jest w stanie znaleźć drogi wyjścia i wpada w pętlę tych samych sterowań, oscylując od jednego punktu do drugiego. Ten problem, także wynika z naszego sposobu koordynacji zachowań wyznaczających prędkości kątowe. Pozycja celu zmusza robota do podążania trasą, gdzie czeka go, prawie czołowe, zderzenie z przeszkodą. Czym jest jej bliżej, tym zachowanie przeciwzderzeniowe, stara się mocniej zmieniać prędkość kątową i ostatecznie robot trafia do kąta przeszkody. W kącie, bardzo powoli, zmienia swoją pozycję, aż udaję mu się wydostać z zaułka, ale i tak, preszkody, wraz z pozycją celu, prowadzą robota do kolejnego zaułka.
+
+Robot cały czas omija jednak ściany.
+
+\newpage
+
+\subsection{Labirynt}
+
+Znacznie trudniejszym zadaniem dla robota jest poruszanie się po labiryncie.
+
+\begin{figure}[h!]
+	\centering
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_1}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_2}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_3}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_4}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_5}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_6}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_7}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_8}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_9}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_10}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_11}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_12}%
+	}%
+	
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_13}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_14}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_15}%
+	}%
+	\hfill
+	\subfloat[]{%
+		\includegraphics[width = \w \linewidth]{test_b_16}%
+	}%
+	
+	\caption{Przykłady zadań w labiryncie}
+\end{figure}
+
+W labiryncie robot radzi sobie znacznie gorzej. W przybliżeniu połowa testów kończy się sukcesem, a druga połowa porażką -- ugrzęźnięciem w jednym z zaułków labiryntu. Nigdy jednak nie zderza się z przeszkodą. Wielokrotnie można też obserwować działanie mechanizmu antyzatrzymaniowego, który na mniej skomplikowanych mapach nie był zbyt często przydatny. Przykłady jego działania można zaoobserwować np. na rysunkach (c), (e) czy (l).
+
+Dużo częściej można było zaoobserwować jak niewielkie zmiany pozycji początkowej robota czy celu, potrafią wypłynąć na ostateczną trasę. Na rysunkach (c) i (d) pozycja celu uległa drobnym zmianom, a trasa robota znacznie się skróciła.
+
+Poza tym, zachowanie robota jest podobne do omówionego w poprzednich przykładach.
+
+%\begin{figure}[h!]
+%	\centering
+%	
+%	\subfloat[zbliżenie dla (c)]{%
+%		\includegraphics[width = \w \linewidth]{test_c_3_zb}%
+%	}%
+%	\hfill
+%	\subfloat[zbliżenie dla (d)]{%
+%		\includegraphics[width = \w \linewidth]{test_c_4_zb}%
+%	}%
+%	\hfill
+%	\subfloat[zbliżenie dla (h)]{%
+%		\includegraphics[width = \w \linewidth]{test_c_8_zb}%
+%	}%
+%	\hfill
+%	\phantom{\subfloat[]{%
+%		\includegraphics[width = \w \linewidth]{test_b_4}%
+%	}}%
+%	
+%	\caption{Robot wpada w pułapkę}
+%\end{figure}
+
+\newpage
+
+\section{Podsumowanie}
+
+Projekt został ukończony pomyślnie. Zaimplementowano system sterowania, który dobrze radzi sobie z docieraniem do celu i w każdej sytuacji potrafi uniknąć kolizji z przeszkodą. System ma jednak swoje wady:
+\begin{itemize}[--]
+\item Generowane przez system trasy są często niepotymalne, a w niektórych przypadkach bardzo skomplikowane. (Dobrym przykładem tego jest rysunek 7k.) Jest to w pewnym stopniu nieuniknione w systemie reaktywnym, ale prawdopodobnie inaczej zbudowany system reaktywny radziłby sobie nieco lepiej.
+\item W wielu przypadkach robot wpada w pułapki z których nie potafi się wydostać, i nieustannie krąży po tych samych ścieżkach.
+\end{itemize}
+
+Dalsze pomysły na rozwinięcie systemu:
+\begin{itemize}[--]
+\item Wykorzystanie szumu/liczb losowych do unikania oscylacji w zaułkach po takich samych ścieżkach. Dzięki temu robot, po kilku iteracjach swojej pętli, mógłby wydostać się z pułapki.
+\item Na bardziej skomplikowanych mapach, takich jak pokazany powyżej labirynt, zastosowanie mógłby znaleźć algorytm do podążania wzdłuż ściany.
+\item Pewnego rodzaju pamięć, nawet krótka, mogłaby także usprawnić radzenie sobie ze wspomnianymi problemami, choć realizacja tego pomysłu byłaby prawdopodobnie znacznie trudniejsza.
+\end{itemize}
+
+Warto też poświęcić chwilę uwagi na wszystkie ,,liczby'', które występują w zbudowanym przez nas systemie. Same wartości liczbowe parametrów nie są w żaden sposób ,,ostateczne'', ani nie były one dla nas najważniejsze. Naszym celem było zbudowanie struktury samego systemu -- zaproponowanie zestawu zachowań oraz sposobu ich koordynacji, tak by robot dobrze radził sobie z realizacją testowanych przez nas zadań. Wartości parametrów powinny być dobierane, w sposób doświadczalny, adekwatnie do problemu, przed którym stawiamy robota. Testowaliśmy wiele różnych wartości parametrów, i dla pewnych sytuacji jedne radzą sobie gorzej od innych. Dlatego też, umieszczane w kodzie wartości różnych współczynników, powinny być czasem zmieniane. Najważniejsza jest struktura systemu.
+
+\newpage
+
+\pagenumbering{roman}
+\begin{appendices}
+\section{Kompletny kod}
+\label{sec:kod}
+
+Poniżej zamieszczamy przykładowe użycie wyrzeźbionego przez nas kodu. Pewne parametry, głównie te znajdujące się przed pętlą symulacyjną, nie są w żaden sposób ,,finalnymi'' wyrobami naszej pracy, a są jedynie przykładowymi parametrami symulacji działania robota.
+
+\begin{lstlisting}
+clear; close all; clc;
+
+% Mapa.
+img = ~logical(rgb2gray(imread('./mapy/mapa_3_extended.png')));
+map = binaryOccupancyMap(img);
+
+% Pojazd.
+R = 0.1; L = 0.5;
+vehicle = DifferentialDrive(R, L);
+
+% Wizualizacja.
+viz = Visualizer2D;
+viz.mapName = 'map';
+goal = [ % Cel - pozycja losowa.
+    rand * size(img, 1);
+    rand * size(img, 2)
+]';
+goal = [300, 175]; % Cel - nielosowany.
+viz.hasWaypoints = true;
+
+% Lidar.
+lidar = LidarSensor;
+lidar.scanAngles = linspace(-pi/2, pi/2, 10);
+lidar.maxRange = 75;
+attachLidarSensor(viz, lidar);
+
+% Dane początkowe.
+pose = [ % Pozycja poczatkowa - losowana.
+    rand * size(img, 1);
+    rand * size(img, 2);
+    (rand - 0.5) * 2*pi
+];
+pose = [500; 500; -pi];     % Pozycja początkowa - nielosowana.
+predkosc_liniowa = 1;       % Pożądana prędkość liniowa.
+wL = 10; wR = 10;           % Wartości początkowe pr. kół.
+dt = 1;                     % Krok czasowy.
+
+
+
+% Pętla symulacyjna.
+for t = 0:dt:6000
+    % Zadanie proste kinematyki.
+    % Znając prędkości kół, dostajemy prędkość liniową i kątową.
+    % Znając krok czasowy znamy jak zmieni się pozycja robota.
+    [v, w] = forwardKinematics(vehicle, wL, wR);
+    angle = w * dt;
+    x = v * cos(pose(3)) * dt;
+    y = v * sin(pose(3)) * dt;
+    
+    % Aktualizacja pozycji.
+    pose = pose + [x; y; angle];
+    
+    % Odczyty lidara.
+    ranges = lidar(pose);
+
+    
+    %%%
+    %%%     ZACHOWANIA I KOORDYNACJA
+    %%%
+        
+    % Dystans od celu.
+    dist = sqrt((pose(1) - goal(1))^2 + (pose(2) - goal(2))^2);
+        
+    % Jeśli odległość robota od celu jest mała,
+    % to zmieniamy kąt skretu - im bliżej tym ciaśniejszy.
+    if dist > 50
+        radius = 50;
+    else
+        radius = (1/sqrt(50) * dist).^2;
+    end
+    
+    
+    % Prędkości obu kół wynikające z przeszkód.
+    omega_obstacle_L = sum( ...
+        f_sigmoidalna(0.1, radius, ranges(1:5)) .* linspace(0.01, 0.1, 5)');
+    omega_obstacle_R = sum( ...
+        f_sigmoidalna(0.1, radius, ranges(6:10)) .* linspace(0.1, 0.01, 5)');
+    
+    % Koordynacja obu tych prędkości.
+    omega_obstacle = omega_obstacle_L - omega_obstacle_R;
+    
+    
+    % Kąt celu.
+    angle_goal = atan2(goal(2) - pose(2), goal(1) - pose(1));
+    
+    % Różnica kątowa wraz z rozwiązaniem problemu nieciągłości
+    % funkcji atan2.
+    angle_diff = atan2( ...
+        sin(angle_goal - pose(3)), ...
+        cos(angle_goal - pose(3)) ...
+    );
+
+    % Prędkość kątowa wynikająca z różnicy kątowej.
+    omega_goal = angle_diff * 0.1;
+    
+    % Mechanizm antyzatrzymaniowy.
+    if predkosc_liniowa < 0.01
+        omega_goal = (angle_diff - pi/2) * 0.1;
+    end
+    
+    
+    % Mechanizm antykolizyjny.
+    % Zmiany prędkości liniowej w funkcji odległości od przeszkody.
+    % Zabezpiecza robota przed kolizją.
+    if min(ranges) < 20
+        predkosc_liniowa = (1/20 * min(ranges))^2;
+    else
+        predkosc_liniowa = 1;
+    end
+    
+    
+    % Współczynnik alfa, przyjmuje wartości z zakresu 0 do 1.
+    % Odpowiada za fuzję prędkości kątowych wyzacznonych od
+    % celu oraz przeszkód.
+    alfa = f_sigmoidalna(0.1, radius, min(ranges));
+    
+    % Prędkość kątowa ostateczna.
+    omega = alfa * omega_obstacle + (1 - alfa) * omega_goal;
+    
+    
+    % Kinematyka odwrotna - otrzymujemy prędkości
+    % obu kół wykorzystywane w następnej chwili czasowej.
+    [wL, wR] = inverseKinematics(vehicle, predkosc_liniowa, omega);
+    
+    
+    %%%
+    %%%     RESZTA
+    %%%
+    
+    % Aktualizacja wizualizacji, co pewien krok czasowy.
+    if mod(t, 10) == 0
+        viz(pose, goal, ranges);
+        pause(0.1);
+    end
+    
+    % Jeśli robot jest bardzo blisko celu to wyłącz symulację.
+    if dist < 5
+        break;
+    end
+end
+
+
+
+function ret = f_sigmoidalna(alpha, D_L0, D_L)
+    % Jeśli D_L = NaN, to znaczy że lidar nic nie wykrył.
+    % Możemy zatem przyjąć, że przeszkoda jest w nieskończoności.
+    D_L(isnan(D_L)) = inf;
+    
+    % Funkcja sigmoidalna nastrojona według argumentów wejściowych.
+    ret = 1 ./ (1 + exp(alpha .* (D_L - D_L0)));
+end
+\end{lstlisting}
+\end{appendices}
+
+\end{document}
